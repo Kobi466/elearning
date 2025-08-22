@@ -1,0 +1,28 @@
+server:
+  port: 8080
+  servlet:
+        context-path: /web
+
+spring:
+    datasource:
+      url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/kobi_identity}
+      driverClassName: com.mysql.cj.jdbc.Driver
+      username: ${DBMS_USERNAME :root}
+      password: ${DBMS_PASSWORD :123456}
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+    data:
+        redis:
+            host: localhost
+            port: 6379
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 300000  # 15 minute in milliseconds
+  refresh-token-expiration: 604800000  # 7 days in milliseconds
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+  client-secret: ${GOOGLE_CLIENT_SECRET}
+  redirect-uri: "http://localhost:8080/oauth2/callback"
+  grant-type: "authorization_code"
