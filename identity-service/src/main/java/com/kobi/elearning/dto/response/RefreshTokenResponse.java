@@ -1,12 +1,12 @@
-package com.kobi.elearning.dto.response.auth;
-
-import java.util.Date;
+package com.kobi.elearning.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import java.util.Date;
 
 @Data
 @AllArgsConstructor

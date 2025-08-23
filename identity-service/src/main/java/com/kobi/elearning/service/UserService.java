@@ -1,14 +1,13 @@
 package com.kobi.elearning.service;
 
-import java.util.List;
-
+import com.kobi.elearning.dto.request.PasswordCreationRequest;
+import com.kobi.elearning.dto.request.UserCreateRequest;
+import com.kobi.elearning.dto.request.UserUpdateRequest;
+import com.kobi.elearning.dto.response.UserResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import com.kobi.elearning.dto.request.auth.PasswordCreationRequest;
-import com.kobi.elearning.dto.request.profile.UserCreateRequest;
-import com.kobi.elearning.dto.request.profile.UserUpdateRequest;
-import com.kobi.elearning.dto.response.profile.UserResponse;
+import java.util.List;
 
 @Service
 public interface UserService {

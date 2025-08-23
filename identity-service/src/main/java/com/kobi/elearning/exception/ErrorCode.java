@@ -1,12 +1,12 @@
 package com.kobi.elearning.exception;
 
-import org.springframework.http.HttpStatus;
-
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
 	USER_ALREADY_EXISTS(201,"User already exists", HttpStatus.BAD_REQUEST),
+    EMAIL_ALREADY_EXISTS(201, "Email already exists", HttpStatus.BAD_REQUEST),
 	USERNAME_INVALID(202,"Username is invalid", HttpStatus.BAD_REQUEST),
 	PASSWORD_INVALID(203,"Password is invalid", HttpStatus.BAD_REQUEST),
 	VALIDATION_ERROR(204, "Validation error", HttpStatus.BAD_REQUEST),

@@ -1,12 +1,11 @@
 package com.kobi.elearning.entity;
 
 
-import java.util.Date;
-
 import jakarta.persistence.*;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.Date;
 
 
 @Entity
@@ -28,8 +27,6 @@ public class RefreshToken {
 	Date expiryTime;
 	@Column(nullable = false)
 	boolean revoked = false;
-	@Column(nullable = false)
-	boolean used;
 	@Column(nullable = false)
 	Date createdAt;
 }

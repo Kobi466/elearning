@@ -1,27 +1,24 @@
 package com.kobi.elearning.controller;
 
+import com.kobi.elearning.dto.request.IntrospectRequest;
+import com.kobi.elearning.dto.request.LoginRequest;
+import com.kobi.elearning.dto.request.LogoutRequest;
+import com.kobi.elearning.dto.request.RefreshTokenRequest;
+import com.kobi.elearning.dto.response.ApiResponse;
+import com.kobi.elearning.dto.response.AuthenticationResponse;
+import com.kobi.elearning.dto.response.IntrospectResponse;
+import com.kobi.elearning.dto.response.RefreshTokenResponse;
+import com.kobi.elearning.exception.SuccessCode;
+import com.kobi.elearning.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.kobi.elearning.dto.request.auth.IntrospectRequest;
-import com.kobi.elearning.dto.request.auth.LoginRequest;
-import com.kobi.elearning.dto.request.auth.LogoutRequest;
-import com.kobi.elearning.dto.request.auth.RefreshTokenRequest;
-import com.kobi.elearning.dto.response.*;
-import com.kobi.elearning.dto.response.auth.AuthenticationResponse;
-import com.kobi.elearning.dto.response.auth.IntrospectResponse;
-import com.kobi.elearning.dto.response.auth.RefreshTokenResponse;
-import com.kobi.elearning.exception.SuccessCode;
-import com.kobi.elearning.service.AuthenticationService;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequiredArgsConstructor
