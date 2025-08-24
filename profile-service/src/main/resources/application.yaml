@@ -1,0 +1,17 @@
+spring:
+    application:
+        name: profile-service
+        neo4j:
+          uri: bolt://localhost:7687 # Thay ??i n?u c?n
+          username: neo4j
+          password: 123456 # Thay ??i m?t kh?u c?a b?n
+
+    kafka:
+      consumer:
+        bootstrap-servers: localhost:9092 # ??a ch? Kafka broker
+        group-id: profile-service-group # ??nh danh consumer group
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+        properties:
+          spring.json.trusted.packages: "*" # Tin t??ng t?t c? các package ?? deserialize JSON
