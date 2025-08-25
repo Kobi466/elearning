@@ -1,4 +1,4 @@
-package com.kobi.profileservice.dto.repsonse;
+package com.kobi.profileservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kobi.profileservice.exception.ErrorCode;

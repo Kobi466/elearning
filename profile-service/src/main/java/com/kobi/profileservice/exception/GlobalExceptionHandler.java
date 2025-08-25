@@ -1,7 +1,7 @@
 package com.kobi.profileservice.exception;
 
 
-import com.kobi.profileservice.dto.repsonse.ApiResponse;
+import com.kobi.profileservice.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;

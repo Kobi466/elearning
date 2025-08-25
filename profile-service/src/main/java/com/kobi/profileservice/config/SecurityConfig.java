@@ -2,7 +2,7 @@ package com.kobi.profileservice.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kobi.profileservice.dto.repsonse.ApiResponse;
+import com.kobi.profileservice.dto.ApiResponse;
 import com.kobi.profileservice.exception.ErrorCode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

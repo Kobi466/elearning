@@ -21,12 +21,14 @@ import com.kobi.elearning.repository.httpclient.GoogleUserInfoClient;
 import com.kobi.elearning.service.AuthenticationService;
 import com.kobi.elearning.service.JwtService;
 import com.kobi.elearning.service.RedisService;
+import com.kobi.event.UserCreateEvent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	RedisService redisService;
 	GoogleOauth2Client googleOauth2Client;
 	GoogleUserInfoClient googleUserInfoClient;
+    KafkaTemplate<String, Object> kafkaTemplate;
 	@NonFinal
 	@Value( "${google.client-id}")
 	String clientId;
@@ -93,6 +96,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                 .build()
                         )
                 );
+        kafkaTemplate.send("user.created", UserCreateEvent
+                .builder()
+                        .userId(user.getUserId())
+                        .userName(user.getUserName())
+                        .email(user.getEmail())
+                        .avatar(userGg.getPicture())
+                        .firstName(userGg.getGivenName())
+                        .lastName(userGg.getFamilyName())
+                        .fullName(userGg.getName())
+                        .locale(userGg.getLocale())
+                .build()
+        );
         String accessToken = jwtService.generateAccessToken(user);
 
         return AuthenticationResponse

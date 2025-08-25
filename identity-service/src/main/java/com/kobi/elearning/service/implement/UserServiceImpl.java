@@ -15,10 +15,12 @@ import com.kobi.elearning.mapper.UserMapper;
 import com.kobi.elearning.repository.RoleRepository;
 import com.kobi.elearning.repository.UserRepository;
 import com.kobi.elearning.service.UserService;
+import com.kobi.event.UserCreateEvent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -36,7 +38,7 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
-
+    KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public void createPassword(PasswordCreationRequest request) {
@@ -67,8 +69,14 @@ public class UserServiceImpl implements UserService {
         HashSet<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByName(PredefinedRole.STUDENT));
         user.setRoles(roles);
-
-        return userMapper.toUserResponse(userRepository.save(user));
+        userRepository.save(user);
+        kafkaTemplate.send("user.created",
+                UserCreateEvent.builder()
+                        .userId(user.getUserId())
+                        .userName(user.getUserName())
+                        .email(user.getEmail())
+                        .build());
+        return userMapper.toUserResponse(user);
     }
 
     @Override
