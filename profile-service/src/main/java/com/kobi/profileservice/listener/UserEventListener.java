@@ -1,4 +1,4 @@
-package com.kobi.profileservice.controller;
+package com.kobi.profileservice.listener;
 
 import com.kobi.event.UserCreateEvent;
 import com.kobi.profileservice.service.ProfileService;
@@ -13,11 +13,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ProfileConsumer {
+public class UserEventListener {
     ProfileService profileService;
-    @KafkaListener(topics = "user.created")
-    public void listenUserCreateEvent(UserCreateEvent message) {
-        log.info("Received message: {}", message);
-        profileService.createProfile(message);
+
+    @KafkaListener(topics = "${kafka.topic.user.created}", groupId = "${spring.kafka.consumer.group-id}")
+    public void handleUserCreated(UserCreateEvent event) {
+        log.info("Received user created event for userId: {}", event.getUserId());
+        profileService.createProfile(event);
     }
 }
