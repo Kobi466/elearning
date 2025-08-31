@@ -41,10 +41,19 @@ public class User {
     @Builder.Default
     Boolean oauth2Account = false;
     @CreationTimestamp
-    Instant createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();  // Giá trị mặc định
+
     @UpdateTimestamp
-    Instant updatedAt;
+    @Column(name = "updated_at")
+    private Instant updatedAt;
     @Enumerated(EnumType.STRING)
     @Builder.Default
     Status status = Status.ACTIVE;
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = Instant.now();
+        }
+    }
 }

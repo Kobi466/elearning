@@ -1,4 +1,7 @@
-
+server:
+  port: 8082
+  servlet:
+    context-path: /profile
 spring:
     application:
         name: profile-service
@@ -8,16 +11,38 @@ spring:
         username: ${NEO4J_USERNAME}
         password: ${NEO4J_PASSWORD}
 
+        # --- Cấu hình Kafka ---
     kafka:
-      bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT} # ??a ch? Kafka broker
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
       consumer:
-        group-id: profile-group # ??nh danh consumer group
+        group-id: profile-service-group
         auto-offset-reset: earliest
         key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-        value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+        value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+
+        # ĐÚNG: Phải đặt trong khối `properties` như thế này
         properties:
-          spring.json.trusted.packages: "*" # Tin t??ng t?t c? c�c package ?? deserialize JSON
-server:
-  port: 8081
-  servlet:
-    context-path: /profile
+          schema.registry.url: http://localhost:8081
+          specific.avro.reader: true
+
+      listener:
+        type: batch
+        ack-mode: manual_immediate
+        missing-topics-fatal: false
+        properties:
+          spring.json.trusted.packages: "*"
+        dlt:
+          enabled: true
+          suffix: .dlt
+          producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            properties:
+              spring.json.add.type.headers: false
+
+
+      # --- Cấu hình tùy chỉnh cho DLT ---
+app:
+  kafka:
+    dlt:
+      topic: user.user.created.v1.DLT

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JsonSchemaMappingsProjectConfiguration">
+    <state>
+      <map>
+        <entry key="Avro Schema">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="Avro Schema" />
+              <option name="relativePathToSchema" value="jar://$APPLICATION_PLUGINS_DIR$/avro-schema-support/lib/avro-schema-support-241.0.2.jar!/schemas/avro-schema.schema.json" />
+              <option name="schemaVersion" value="JSON Schema 7" />
+              <option name="applicationDefined" value="true" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value="common-library/src/main/avro/UserCreatedEvent.avsc" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+      </map>
+    </state>
+  </component>
+</project>

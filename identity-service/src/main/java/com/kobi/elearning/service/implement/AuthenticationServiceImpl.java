@@ -1,6 +1,7 @@
 package com.kobi.elearning.service.implement;
 
 
+import com.kobi.avro.UserPayload;
 import com.kobi.elearning.constant.AuthProvider;
 import com.kobi.elearning.constant.PredefinedRole;
 import com.kobi.elearning.dto.request.*;
@@ -20,8 +21,8 @@ import com.kobi.elearning.repository.httpclient.GoogleOauth2Client;
 import com.kobi.elearning.repository.httpclient.GoogleUserInfoClient;
 import com.kobi.elearning.service.AuthenticationService;
 import com.kobi.elearning.service.JwtService;
+import com.kobi.elearning.service.OutboxEventService;
 import com.kobi.elearning.service.RedisService;
-import com.kobi.event.UserCreateEvent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,7 +33,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	RedisService redisService;
 	GoogleOauth2Client googleOauth2Client;
 	GoogleUserInfoClient googleUserInfoClient;
-    KafkaTemplate<String, Object> kafkaTemplate;
+    OutboxEventService outboxEventService;
 	@NonFinal
 	@Value( "${google.client-id}")
 	String clientId;
@@ -96,17 +96,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                 .build()
                         )
                 );
-        kafkaTemplate.send("user.created", UserCreateEvent
-                .builder()
-                        .userId(user.getUserId())
-                        .userName(user.getUserName())
-                        .email(user.getEmail())
-                        .avatar(userGg.getPicture())
-                        .firstName(userGg.getGivenName())
-                        .lastName(userGg.getFamilyName())
-                        .fullName(userGg.getName())
-                        .locale(userGg.getLocale())
-                .build()
+        UserPayload payload = UserPayload.newBuilder()
+                .setUserId(user.getUserId())
+                .setUserName(user.getUserName())
+                .setEmail(user.getEmail())
+                .setAvatar(userGg.getPicture())
+                .setFullName(userGg.getName())
+                .setFirstName(userGg.getGivenName())
+                .setLastName(userGg.getFamilyName())
+                .setLocale(userGg.getLocale())
+                .setCreatedAt((user.getCreatedAt()))
+                .build();
+        // Không nên để payload là entity user lộ thông tin quan trọng như pass
+        outboxEventService.saveOutboxEvent(
+                "user.user-created.v1",
+                "user",
+                payload.getUserId(),
+                "created",
+                payload,
+                "identity_service",
+                null,
+                payload.getUserId()
         );
         String accessToken = jwtService.generateAccessToken(user);
 

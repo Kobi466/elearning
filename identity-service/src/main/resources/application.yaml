@@ -1,7 +1,7 @@
 server:
   port: 8080
   servlet:
-        context-path: /web
+        context-path: /identity
 
 spring:
     datasource:
@@ -13,6 +13,10 @@ spring:
         hibernate:
           ddl-auto: create-drop
         show-sql: true
+        logging:
+          level:
+            org.hibernate.SQL: DEBUG
+            org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     data:
         redis:
             host: ${REDIS_HOST}
@@ -21,8 +25,12 @@ spring:
     kafka:
       bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
       producer:
+        # Chỉ định serializer cho Key (thường là String)
         key-serializer: org.apache.kafka.common.serialization.StringSerializer
-        value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+        # 🪄 Quan trọng: Chỉ định Avro Serializer cho Value
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer # <-- ĐÚNG
+      properties:
+        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
 jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: 300000  # 15 minute in milliseconds

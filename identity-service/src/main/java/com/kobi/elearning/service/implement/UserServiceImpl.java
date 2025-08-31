@@ -1,6 +1,7 @@
 package com.kobi.elearning.service.implement;
 
 
+import com.kobi.avro.UserPayload;
 import com.kobi.elearning.constant.AuthProvider;
 import com.kobi.elearning.constant.PredefinedRole;
 import com.kobi.elearning.dto.request.PasswordCreationRequest;
@@ -14,18 +15,20 @@ import com.kobi.elearning.exception.ErrorCode;
 import com.kobi.elearning.mapper.UserMapper;
 import com.kobi.elearning.repository.RoleRepository;
 import com.kobi.elearning.repository.UserRepository;
+import com.kobi.elearning.service.OutboxEventService;
 import com.kobi.elearning.service.UserService;
-import com.kobi.event.UserCreateEvent;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 
@@ -38,7 +41,7 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
-    KafkaTemplate<String, Object> kafkaTemplate;
+    OutboxEventService outboxEventService;
 
     @Override
     public void createPassword(PasswordCreationRequest request) {
@@ -55,6 +58,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user1);
     }
 
+    @Transactional
     @Override
     public UserResponse createUser(UserCreateRequest request) {
         if (userRepository.existsByUserName(request.getUserName())) {
@@ -69,14 +73,26 @@ public class UserServiceImpl implements UserService {
         HashSet<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByName(PredefinedRole.STUDENT));
         user.setRoles(roles);
-        userRepository.save(user);
-        kafkaTemplate.send("user.created",
-                UserCreateEvent.builder()
-                        .userId(user.getUserId())
-                        .userName(user.getUserName())
-                        .email(user.getEmail())
-                        .build());
-        return userMapper.toUserResponse(user);
+
+        var saveUser = userRepository.save(user);
+        UserPayload payload = UserPayload.newBuilder()
+                .setUserId(saveUser.getUserId())
+                .setUserName(saveUser.getUserName())
+                .setEmail(saveUser.getEmail())
+                .setCreatedAt(saveUser.getCreatedAt())
+                .build();
+        // Không nên để payload là entity user lộ thông tin quan trọng như pass
+        outboxEventService.saveOutboxEvent(
+                "user.user-created.v1",
+                "user",
+                saveUser.getUserId(),
+                "created",
+                payload,
+                "identity_service",
+                null,
+                saveUser.getUserId()
+        );
+        return userMapper.toUserResponse(saveUser);
     }
 
     @Override

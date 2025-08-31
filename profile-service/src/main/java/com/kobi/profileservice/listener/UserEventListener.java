@@ -1,12 +1,15 @@
 package com.kobi.profileservice.listener;
 
-import com.kobi.event.UserCreateEvent;
-import com.kobi.profileservice.service.ProfileService;
+
+import com.kobi.avro.UserCreatedEvent;
+import com.kobi.profileservice.service.ProcessedEventService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,11 +17,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserEventListener {
-    ProfileService profileService;
+    ProcessedEventService processedEventService;
 
-    @KafkaListener(topics = "${kafka.topic.user.created}", groupId = "${spring.kafka.consumer.group-id}")
-    public void handleUserCreated(UserCreateEvent event) {
-        log.info("Received user created event for userId: {}", event.getUserId());
-        profileService.createProfile(event);
+    @KafkaListener(topics = "user.user-created.v1", groupId = "profile-service-group")
+    public void handleUserCreated(@Payload UserCreatedEvent event) {
+
+        processedEventService.processEvent(event);
     }
 }
+
