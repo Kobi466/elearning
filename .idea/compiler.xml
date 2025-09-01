@@ -9,8 +9,8 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="profile-service" />
-        <module name="e-learning" />
         <module name="common-library" />
+        <module name="identity-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -25,8 +25,8 @@
       <module name="common-library" options="" />
       <module name="e-elearning" options="-parameters" />
       <module name="e-elearning (1)" options="-parameters" />
-      <module name="e-learning" options="-parameters" />
       <module name="elearning" options="-parameters" />
+      <module name="identity-service" options="-parameters" />
       <module name="profile-service" options="-parameters" />
     </option>
   </component>

@@ -1,6 +1,7 @@
 package com.kobi.elearning.service.implement;
 
 
+import com.kobi.avro.UserCreatedEvent;
 import com.kobi.avro.UserPayload;
 import com.kobi.elearning.constant.AuthProvider;
 import com.kobi.elearning.constant.PredefinedRole;
@@ -28,9 +29,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -75,11 +78,22 @@ public class UserServiceImpl implements UserService {
         user.setRoles(roles);
 
         var saveUser = userRepository.save(user);
-        UserPayload payload = UserPayload.newBuilder()
-                .setUserId(saveUser.getUserId())
-                .setUserName(saveUser.getUserName())
-                .setEmail(saveUser.getEmail())
-                .setCreatedAt(saveUser.getCreatedAt())
+        var payload = UserCreatedEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType("created")
+                .setEventVersion(1)
+                .setOccurredAt(Instant.now())
+                .setCorrelationId(null)
+                .setCausationId(UUID.randomUUID().toString())
+                .setSource("identity-service")
+                .setAggregateId(user.getUserId())
+                .setUser(UserPayload.newBuilder()
+                        .setUserId(user.getUserId())
+                        .setEmail(user.getEmail())
+                        .setUserName(user.getUserName())
+                        .setCreatedAt(user.getCreatedAt())
+                        .build()
+                )
                 .build();
         // Không nên để payload là entity user lộ thông tin quan trọng như pass
         outboxEventService.saveOutboxEvent(

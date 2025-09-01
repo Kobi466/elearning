@@ -28,9 +28,8 @@ public class OutboxPublisher {
     OutboxEventRepository outboxEventRepository;
     KafkaTemplate<String, byte[]> kafkaTemplate;
     TransactionTemplate transactionTemplate;
-    ObjectMapper objectMapper;
-    Serializer<Object> serializer;
-    @Scheduled(fixedDelay = 5000)
+
+    @Scheduled(fixedDelay = 10000)
     public void pollingPublisher() {
         List<OutboxEvent> list = outboxEventRepository
                 .findTop100ByStatusOrderByCreatedAtAsc(
@@ -43,36 +42,12 @@ public class OutboxPublisher {
         for (OutboxEvent outboxEvent : list) {
             transactionTemplate.executeWithoutResult(transactionStatus -> {
                 try {
-//                    String topic = "user."
-//                            + outboxEvent.getAggregateType() + "-"
-//                            + outboxEvent.getEventType() + ".v"
-//                            + outboxEvent.getVersion();
-                    String topic = "user.user-created.v1"; // Hardcoded to match the consumer
-
+                    String topic = "user."
+                            + outboxEvent.getAggregateType() + "-"
+                            + outboxEvent.getEventType() + ".v"
+                            + outboxEvent.getVersion();
                     log.info("Sending message to topic: {}", topic);
-//                    var payload = objectMapper.readValue(outboxEvent.getPayload(), UserPayload.class);
-//                    var avro = UserCreatedEvent.newBuilder()
-//                            .setEventId(outboxEvent.getId())
-//                            .setEventType(outboxEvent.getEventType())
-//                            .setEventVersion(outboxEvent.getVersion())
-//                            .setOccurredAt(outboxEvent.getCreatedAt())
-//                            .setCorrelationId(outboxEvent.getCorrelationId())
-//                            .setCausationId(outboxEvent.getId())
-//                            .setSource(outboxEvent.getSource())
-//                            .setAggregateId(outboxEvent.getAggregateId())
-//                            .setUser(UserPayload.newBuilder()
-//                                    .setUserId(outboxEvent.getAggregateId())
-//                                    .setEmail(payload.getEmail())
-//                                    .setUserName(payload.getUserName())
-//                                    .setFullName(payload.getFullName())
-//                                    .setCreatedAt(payload.getCreatedAt())
-//                                    .setFirstName(payload.getFirstName())
-//                                    .setLastName(payload.getLastName())
-//                                    .setAvatar(payload.getAvatar())
-//                                    .setLocale(payload.getLocale())
-//                                    .build()
-//                            )
-//                            .build();
+//
                     ProducerRecord<String, byte[]> record = new ProducerRecord<>(
                             topic,
                             outboxEvent.getAggregateId(),

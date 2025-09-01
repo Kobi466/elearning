@@ -25,12 +25,13 @@ spring:
     kafka:
       bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
       producer:
-        # Chỉ định serializer cho Key (thường là String)
+        bootstrap-servers: localhost:9092
         key-serializer: org.apache.kafka.common.serialization.StringSerializer
-        # 🪄 Quan trọng: Chỉ định Avro Serializer cho Value
-        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer # <-- ĐÚNG
+        # QUAN TRỌNG: Polling Publisher chỉ gửi đi byte[] đã được serialize sẵn
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
       properties:
-        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+          # URL này dùng cho bean KafkaAvroSerializer trong code
+        schema.registry.url: http://localhost:8081
 jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: 300000  # 15 minute in milliseconds

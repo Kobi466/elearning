@@ -108,16 +108,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .setCreatedAt((user.getCreatedAt()))
                 .build();
         // Không nên để payload là entity user lộ thông tin quan trọng như pass
-        outboxEventService.saveOutboxEvent(
-                "user.user-created.v1",
-                "user",
-                payload.getUserId(),
-                "created",
-                payload,
-                "identity_service",
-                null,
-                payload.getUserId()
-        );
+//        outboxEventService.saveOutboxEvent(
+//                "user.user-created.v1",
+//                "user",
+//                payload.getUserId(),
+//                "created",
+//                payload,
+//                "identity_service",
+//                null,
+//                payload.getUserId()
+//        );
         String accessToken = jwtService.generateAccessToken(user);
 
         return AuthenticationResponse

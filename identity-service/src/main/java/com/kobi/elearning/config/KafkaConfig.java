@@ -16,7 +16,7 @@ public class KafkaConfig {
 
     @Bean
     public Serializer<Object> kafkaAvroSerializer() {
-        Serializer<Object> serializer = (Serializer<Object>) (Object) new KafkaAvroSerializer();
+        Serializer<Object> serializer = new KafkaAvroSerializer();
         Map<String, String> config = new HashMap<>();
         config.put("schema.registry.url", schemaRegistryUrl);
         serializer.configure(config, false);

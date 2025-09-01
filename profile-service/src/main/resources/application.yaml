@@ -18,31 +18,23 @@ spring:
         group-id: profile-service-group
         auto-offset-reset: earliest
         key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+          # Cấu hình quan trọng nhất để giải mã Avro
         value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-
-        # ĐÚNG: Phải đặt trong khối `properties` như thế này
         properties:
-          schema.registry.url: http://localhost:8081
+            # Địa chỉ của Schema Registry
+          schema.registry.url: http://localhost:8081 # <-- Thay bằng địa chỉ Schema Registry của bạn
+            # Báo cho deserializer biết rằng bạn muốn nhận đối tượng Avro cụ thể (SpecificRecord)
           specific.avro.reader: true
 
       listener:
         type: batch
         ack-mode: manual_immediate
         missing-topics-fatal: false
-        properties:
-          spring.json.trusted.packages: "*"
         dlt:
           enabled: true
-          suffix: .dlt
+          suffix: .dlt # Tự động tạo topic DLT với hậu tố .dlt
           producer:
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
-            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-            properties:
-              spring.json.add.type.headers: false
-
-
-      # --- Cấu hình tùy chỉnh cho DLT ---
-app:
-  kafka:
-    dlt:
-      topic: user.user.created.v1.DLT
+                    # Khi gửi message lỗi vào DLT, chúng ta muốn gửi nguyên bản payload (dạng byte[])
+                    # mà không cần chuyển đổi, do đó dùng ByteArraySerializer.
+            value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
