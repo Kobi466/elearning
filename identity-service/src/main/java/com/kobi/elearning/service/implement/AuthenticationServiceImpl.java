@@ -1,6 +1,7 @@
 package com.kobi.elearning.service.implement;
 
 
+import com.kobi.avro.UserCreatedEvent;
 import com.kobi.avro.UserPayload;
 import com.kobi.elearning.constant.AuthProvider;
 import com.kobi.elearning.constant.PredefinedRole;
@@ -29,13 +30,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -96,28 +98,39 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                 .build()
                         )
                 );
-        UserPayload payload = UserPayload.newBuilder()
-                .setUserId(user.getUserId())
-                .setUserName(user.getUserName())
-                .setEmail(user.getEmail())
-                .setAvatar(userGg.getPicture())
-                .setFullName(userGg.getName())
-                .setFirstName(userGg.getGivenName())
-                .setLastName(userGg.getFamilyName())
-                .setLocale(userGg.getLocale())
-                .setCreatedAt((user.getCreatedAt()))
+        var payload = UserCreatedEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType("created")
+                .setEventVersion(1)
+                .setOccurredAt(Instant.now())
+                .setCorrelationId(null)
+                .setCausationId(UUID.randomUUID().toString())
+                .setSource("identity-service")
+                .setAggregateId(user.getUserId())
+                .setUser(UserPayload.newBuilder()
+                        .setUserId(user.getUserId())
+                        .setUserName(user.getUserName())
+                        .setEmail(user.getEmail())
+                        .setAvatar(userGg.getPicture())
+                        .setFullName(userGg.getName())
+                        .setFirstName(userGg.getGivenName())
+                        .setLastName(userGg.getFamilyName())
+                        .setLocale(userGg.getLocale())
+                        .setCreatedAt((user.getCreatedAt()))
+                        .build()
+                )
                 .build();
         // Không nên để payload là entity user lộ thông tin quan trọng như pass
-//        outboxEventService.saveOutboxEvent(
-//                "user.user-created.v1",
-//                "user",
-//                payload.getUserId(),
-//                "created",
-//                payload,
-//                "identity_service",
-//                null,
-//                payload.getUserId()
-//        );
+        outboxEventService.saveOutboxEvent(
+                "user.user-created.v1",
+                "user",
+                user.getUserId(),
+                "created",
+                payload,
+                "identity_service",
+                null,
+                user.getUserId()
+        );
         String accessToken = jwtService.generateAccessToken(user);
 
         return AuthenticationResponse

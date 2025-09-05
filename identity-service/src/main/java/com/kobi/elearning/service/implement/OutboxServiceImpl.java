@@ -1,21 +1,14 @@
 package com.kobi.elearning.service.implement;
 
-import com.kobi.avro.UserCreatedEvent;
-import com.kobi.avro.UserPayload;
 import com.kobi.elearning.entity.OutboxEvent;
-import com.kobi.elearning.entity.User;
 import com.kobi.elearning.repository.OutboxEventRepository;
 import com.kobi.elearning.service.OutboxEventService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serializer;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -49,26 +42,5 @@ public class OutboxServiceImpl implements OutboxEventService {
 
         );
         log.info("OUTBOX EVENT SAVED");
-    }
-
-    @Override
-    public UserCreatedEvent createdEvent(User user) {
-        return UserCreatedEvent.newBuilder()
-                .setEventId(UUID.randomUUID().toString())
-                .setEventType("created")
-                .setEventVersion(1)
-                .setOccurredAt(Instant.now())
-                .setCorrelationId(null)
-                .setCausationId(UUID.randomUUID().toString())
-                .setSource("identity-service")
-                .setAggregateId(user.getUserId())
-                .setUser(UserPayload.newBuilder()
-                        .setUserId(user.getUserId())
-                        .setEmail(user.getEmail())
-                        .setUserName(user.getUserName())
-                        .setCreatedAt(user.getCreatedAt())
-                        .build()
-                )
-                .build();
     }
 }

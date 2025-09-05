@@ -54,7 +54,7 @@ public class OutboxEvent {
     // 🔹 Version của schema sự kiện (dùng khi thay đổi cấu trúc message).
     // VD: version = 1 (sau này nếu thêm field thì version = 2)
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     byte[] payload;
     // 🔹 Nội dung data (message) của sự kiện, thường là JSON hoặc Avro bytes.
     // VD (JSON):

@@ -1,16 +1,12 @@
 package com.kobi.elearning.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kobi.avro.UserCreatedEvent;
-import com.kobi.avro.UserPayload;
 import com.kobi.elearning.entity.OutboxEvent;
 import com.kobi.elearning.repository.OutboxEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.Serializer;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
