@@ -24,7 +24,6 @@ import java.time.Instant;
 public class OutboxEvent {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     // 🔹 ID duy nhất của sự kiện (UUID).
     // VD: "2a0f6eaa-0dcd-4d4a-9f67-3b21aef3db3b"

@@ -20,6 +20,7 @@ public class OutboxServiceImpl implements OutboxEventService {
 
     @Override
     public void saveOutboxEvent(
+            String id,
             String topic,
             String aggregateType,
             String aggregateId,
@@ -31,6 +32,7 @@ public class OutboxServiceImpl implements OutboxEventService {
     ) {
         var payload = serializer.serialize(topic, event);
         outboxEventRepository.save(OutboxEvent.builder()
+                .id(id)
                 .aggregateId(aggregateId)
                 .aggregateType(aggregateType)
                 .eventType(eventType)
@@ -39,7 +41,6 @@ public class OutboxServiceImpl implements OutboxEventService {
                 .source(source)
                 .partitionKey(partitionKey)
                 .build()
-
         );
         log.info("OUTBOX EVENT SAVED");
     }

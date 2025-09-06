@@ -104,7 +104,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .setEventVersion(1)
                 .setOccurredAt(Instant.now())
                 .setCorrelationId(null)
-                .setCausationId(UUID.randomUUID().toString())
+                .setCausationId(null)
                 .setSource("identity-service")
                 .setAggregateId(user.getUserId())
                 .setUser(UserPayload.newBuilder()
@@ -122,13 +122,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
         // Không nên để payload là entity user lộ thông tin quan trọng như pass
         outboxEventService.saveOutboxEvent(
+                payload.getEventId(),
                 "user.user-created.v1",
                 "user",
                 user.getUserId(),
-                "created",
+                payload.getEventType(),
                 payload,
-                "identity_service",
-                null,
+                payload.getCorrelationId(),
+                payload.getSource(),
                 user.getUserId()
         );
         String accessToken = jwtService.generateAccessToken(user);

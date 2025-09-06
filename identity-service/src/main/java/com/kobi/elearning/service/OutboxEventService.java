@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface OutboxEventService {
-    void saveOutboxEvent(String topic
+    void saveOutboxEvent(
+            String eventId
+            , String topic
             , String aggregateType
             , String aggregateId
             , String eventType
