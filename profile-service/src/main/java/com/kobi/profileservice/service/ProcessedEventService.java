@@ -22,20 +22,20 @@ public class ProcessedEventService {
 
     @Transactional
     public void processEvent(UserCreatedEvent event) {
-//        if (processedEventRepository.existsByEventId(event.getEventId())){
-//            log.info("Event already processed {}", event.getEventId());
-//            return;
-//        }
-//        profileService.createProfileFromPayload(event.getUser());
-//
-//        processedEventRepository.save(
-//                ProcessedEvent.builder()
-//                        .eventId(event.getEventId())
-//                        .processedAt(Instant.now())
-//                        .build()
-//        );
-//        log.info("Event processed {}", event.getEventId());
-        System.out.println("DEBUG: Intentionally throwing an exception to test the Saga unhappy path.");
-        throw new RuntimeException("Simulating a database error to trigger compensation!");
+        if (processedEventRepository.existsByEventId(event.getEventId())){
+            log.info("Event already processed {}", event.getEventId());
+            return;
+        }
+        profileService.createProfileFromPayload(event.getUser());
+
+        processedEventRepository.save(
+                ProcessedEvent.builder()
+                        .eventId(event.getEventId())
+                        .processedAt(Instant.now())
+                        .build()
+        );
+        log.info("Event processed {}", event.getEventId());
+//        System.out.println("DEBUG: Intentionally throwing an exception to test the Saga unhappy path.");
+//        throw new RuntimeException("Simulating a database error to trigger compensation!");
     }
 }
