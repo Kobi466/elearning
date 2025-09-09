@@ -1,2 +1,0 @@
-# SkillShareDAO
-Web E-Learning
