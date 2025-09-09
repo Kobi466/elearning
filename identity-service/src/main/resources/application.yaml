@@ -37,10 +37,9 @@ spring:
         group-id: identity-service-compensation-group
         bootstrap-servers: localhost:9092
         key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-        value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+        value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
         properties:
-            schema.registry.url: http://localhost:8081
-            specific.avro.reader: true
+          spring.json.trusted.packages: "*" # Tin t??ng t?t c? c�c package ?? deserialize JSON
       listener:
         type: batch
         ack-mode: manual_immediate

@@ -27,9 +27,8 @@ spring:
           specific.avro.reader: true
       producer:
         key-serializer: org.apache.kafka.common.serialization.StringSerializer
-        value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
-        properties:
-          schema.registry.url: http://localhost:8081
+        value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
       listener:
         type: batch
         ack-mode: manual_immediate

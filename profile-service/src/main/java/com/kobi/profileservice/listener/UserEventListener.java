@@ -1,10 +1,9 @@
 package com.kobi.profileservice.listener;
 
 
-import com.kobi.avro.ProfileCreationFailedEvent;
 import com.kobi.avro.UserCreatedEvent;
 import com.kobi.profileservice.service.ProcessedEventService;
-
+import event.ProfileCreationFailed;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,13 +26,14 @@ public class UserEventListener {
         try {
             processedEventService.processEvent(event);
         } catch (Exception e) {
-            String userId = event.getUser() != null ? event.getUser().getUserId() : "Unknown";
-            var profileEventFail = ProfileCreationFailedEvent.newBuilder()
-                    .setUserId(userId)
-                    .setReason("Failed to process event: "+e.getMessage())
+            String userId = event.getUser().getUserId();
+            var profileEventFail = ProfileCreationFailed.
+                    builder()
+                    .userId(userId)
+                    .reason(e.getMessage())
                     .build();
-            kafkaTemplate.send("user.profile-creation-failed.v1", profileEventFail);
-            log.error("Failed to process event {}", event.getEventId(), e);
+            kafkaTemplate.send("user.profile-creation-failed.v1", userId, profileEventFail);
+            log.error("Error occurred while processing user created event: {}", e.getMessage());
         }
     }
 }
