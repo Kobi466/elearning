@@ -11,7 +11,7 @@ spring:
       password: ${DBMS_PASSWORD}
     jpa:
         hibernate:
-          ddl-auto: create-drop
+          ddl-auto: update
         show-sql: true
         logging:
           level:
@@ -32,6 +32,27 @@ spring:
       properties:
           # URL này dùng cho bean KafkaAvroSerializer trong code
         schema.registry.url: http://localhost:8081
+      consumer:
+        auto-offset-reset: earliest
+        group-id: identity-service-compensation-group
+        bootstrap-servers: localhost:9092
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+        properties:
+            schema.registry.url: http://localhost:8081
+            specific.avro.reader: true
+      listener:
+        type: batch
+        ack-mode: manual_immediate
+        missing-topics-fatal: false
+        dlt:
+          enabled: true
+          suffix: .dlt # Tự động tạo topic DLT với hậu tố .dlt
+          producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            # Khi gửi message lỗi vào DLT, chúng ta muốn gửi nguyên bản payload (dạng byte[])
+            # mà không cần chuyển đổi, do đó dùng ByteArraySerializer.
+            value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: 300000  # 15 minute in milliseconds

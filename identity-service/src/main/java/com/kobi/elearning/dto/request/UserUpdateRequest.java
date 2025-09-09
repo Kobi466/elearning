@@ -1,10 +1,11 @@
 package com.kobi.elearning.dto.request;
 
+import java.util.List;
+
 import jakarta.validation.constraints.Size;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor

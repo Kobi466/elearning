@@ -25,7 +25,11 @@ spring:
           schema.registry.url: http://localhost:8081 # <-- Thay bằng địa chỉ Schema Registry của bạn
             # Báo cho deserializer biết rằng bạn muốn nhận đối tượng Avro cụ thể (SpecificRecord)
           specific.avro.reader: true
-
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+        properties:
+          schema.registry.url: http://localhost:8081
       listener:
         type: batch
         ack-mode: manual_immediate

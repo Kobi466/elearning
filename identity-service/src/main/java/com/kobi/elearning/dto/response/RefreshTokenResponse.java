@@ -1,12 +1,12 @@
 package com.kobi.elearning.dto.response;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
