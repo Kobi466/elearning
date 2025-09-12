@@ -35,6 +35,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
 @RequiredArgsConstructor
@@ -95,6 +97,10 @@ public class UserServiceImpl implements UserService {
 		user.setRoles(roles);
 
 		var saveUser = userRepository.save(user);
+        // add headers token vao feinclient
+//        ServletRequestAttributes attr =
+//                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+//        var authHeader = attr.getRequest().getHeader("Authorization");
 		var payload = UserCreatedEvent.newBuilder()
 				.setEventId(UUID.randomUUID().toString())
 				.setEventType("created")
