@@ -3,6 +3,15 @@ server:
 spring:
     application:
         name: api-gateway
+#  # ---- CẤU HÌNH SECURITY (XÁC THỰC) ----
+#    security:
+#      oauth2:
+#        resourceserver:
+#          jwt:
+#            # Chỉ dẫn cho Gateway biết nơi lấy public key để xác thực JWT
+#            introspection:
+#              endpoint-uri: http://localhost:8080/identity/api/v1/auth/introspect
+
     cloud:
       gateway:
         routes:
