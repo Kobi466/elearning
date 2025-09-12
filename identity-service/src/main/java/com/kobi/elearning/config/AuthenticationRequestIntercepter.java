@@ -19,4 +19,9 @@
 //        }
 //    }
 //}
+
+
+//import org.springframework.stereotype.Component;
+//
+//@Component
 ////Co the config internal feign client
