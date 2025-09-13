@@ -3,6 +3,7 @@ package com.kobi.profileservice.listener;
 
 import com.kobi.avro.UserCreatedEvent;
 import com.kobi.profileservice.service.ProcessedEventService;
+import event.NotificationEvent;
 import event.ProfileCreationFailed;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +28,15 @@ public class UserEventListener {
     public void handleUserCreated(@Payload UserCreatedEvent event) {
         try {
             processedEventService.processEvent(event);
+            // send event success to notification service
+            kafkaTemplate.send("onboard-success"
+                    , NotificationEvent.builder()
+                            .channel("Email")
+                            .recipient(event.getUser().getEmail())
+                            .template("Welcome to KOBI ELearning")
+                            .param(Map.of("userName", event.getUser().getUserName()))
+                            .build()
+            );
         } catch (Exception e) {
             String userId = event.getUser().getUserId();
             var profileEventFail = ProfileCreationFailed.

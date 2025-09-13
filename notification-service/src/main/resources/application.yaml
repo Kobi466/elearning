@@ -14,5 +14,10 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
         spring.json.trusted.packages: "*"
-brevo:
-  api-key: ${brevo_api_key}
+notification:
+  email:
+    brevo-url: ${brevo_url}
+    brevo-api-key: ${brevo_api_key}
+  sender:
+    name: ${sender_name}
+    email: ${sender_email}
