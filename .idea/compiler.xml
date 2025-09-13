@@ -11,12 +11,14 @@
         <module name="profile-service" />
         <module name="common-library" />
         <module name="identity-service" />
+        <module name="notification-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="e-elearning" target="21" />
       <module name="e-elearning (1)" target="21" />
       <module name="elearning" target="21" />
+      <module name="notification" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -27,6 +29,8 @@
       <module name="e-elearning (1)" options="-parameters" />
       <module name="elearning" options="-parameters" />
       <module name="identity-service" options="-parameters" />
+      <module name="notification" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
       <module name="profile-service" options="-parameters" />
     </option>
   </component>
