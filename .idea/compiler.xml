@@ -13,6 +13,15 @@
         <module name="identity-service" />
         <module name="notification-service" />
       </profile>
+      <profile name="Annotation profile for file-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="file-service" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="e-elearning" target="21" />
@@ -28,6 +37,7 @@
       <module name="e-elearning" options="-parameters" />
       <module name="e-elearning (1)" options="-parameters" />
       <module name="elearning" options="-parameters" />
+      <module name="file-service" options="-parameters" />
       <module name="identity-service" options="-parameters" />
       <module name="notification" options="-parameters" />
       <module name="notification-service" options="-parameters" />
