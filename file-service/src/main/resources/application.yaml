@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: file-service
+server:
+  servlet:
+    context-path: /file
+  port: 8086
