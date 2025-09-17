@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
+        <module name="course-service" />
         <module name="profile-service" />
         <module name="common-library" />
         <module name="identity-service" />
@@ -34,6 +35,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
       <module name="common-library" options="" />
+      <module name="course-service" options="-parameters" />
       <module name="e-elearning" options="-parameters" />
       <module name="e-elearning (1)" options="-parameters" />
       <module name="elearning" options="-parameters" />
