@@ -11,12 +11,8 @@ spring:
       password: ${DBMS_PASSWORD}
     jpa:
         hibernate:
-          ddl-auto: create-drop
+          ddl-auto: update
         show-sql: true
-        logging:
-          level:
-            org.hibernate.SQL: DEBUG
-            org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     data:
         redis:
             host: ${REDIS_HOST}
