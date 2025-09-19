@@ -19,6 +19,12 @@ import java.util.List;
 public class ProfileController {
     ProfileService profileService;
 
+    // API mới để lấy profile của user hiện tại
+    @GetMapping("/me")
+    ApiResponse<ProfileResponse> getMyProfile() {
+        return ApiResponse.ok(profileService.getMyProfile(), SuccessCode.GET_PROFILE_SUCCESS);
+    }
+
     @PutMapping("update")
     ApiResponse<ProfileResponse> updateProfile(@RequestBody ProfileUpdateRequest request) {
         return ApiResponse.ok(profileService.updateProfile(request), SuccessCode.PROFILE_UPDATED);

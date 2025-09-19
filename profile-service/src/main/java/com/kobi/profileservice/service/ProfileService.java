@@ -21,6 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -31,22 +32,32 @@ public class ProfileService {
     ProfileRepository profileRepository;
     ProfileMapper profileMapper;
     FileClient fileClient;
+
+    // *** SỬA LỖI 1: Xử lý an toàn các trường null khi tạo profile từ Kafka event ***
     public void createProfileFromPayload(UserPayload payload){
-        profileRepository.save(Profile.builder()
+        Profile profile = Profile.builder()
                 .userId(payload.getUserId())
                 .userName(payload.getUserName())
                 .email(payload.getEmail())
-                .fullName(payload.getFullName())
-                .firstName(payload.getFirstName())
-                .lastName(payload.getLastName())
-                .locale(payload.getLocale())
-                .build());
-        log.info("PROFILE CREATED");
+                // Nếu fullName null thì dùng userName thay thế
+                .fullName(Objects.toString(payload.getFullName(), payload.getUserName())) 
+                .firstName(Objects.toString(payload.getFirstName(), ""))
+                .lastName(Objects.toString(payload.getLastName(), ""))
+                .locale(Objects.toString(payload.getLocale(), "en"))
+                .build();
+        profileRepository.save(profile);
+        log.info("PROFILE CREATED for user ID: {}", payload.getUserId());
     }
 
     private Profile getProfileByUserId(String userId) {
         return profileRepository.findByUserId(userId).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    public ProfileResponse getMyProfile() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var profile = getProfileByUserId(userId);
+        return profileMapper.toProfileResponse(profile);
     }
 
     public ProfileResponse updateProfile(ProfileUpdateRequest request) {
@@ -59,10 +70,6 @@ public class ProfileService {
     public ProfileResponse updateAvatar(MultipartFile avatar) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         var profile = getProfileByUserId(userId);
-        //Request Header to File service
-//        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-//        String token = attributes.getRequest().getHeader("Authorization");
-//        var urlAvatar = fileClient.uploadFile(token, avatar).block().getData().getUrl();
         var urlAvatar = fileClient.uploadFile(avatar).block().getData().getUrl();
         profile.setAvatar(urlAvatar);
         return profileMapper.toProfileResponse(profileRepository.save(profile));
