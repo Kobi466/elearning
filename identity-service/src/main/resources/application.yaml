@@ -50,7 +50,7 @@ spring:
             value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 jwt:
   secret: ${JWT_SECRET}
-  access-token-expiration: 300000  # 15 minute in milliseconds
+  access-token-expiration: 259200000  # 15 minute in milliseconds
   refresh-token-expiration: 604800000  # 7 days in milliseconds
 google:
   client-id: ${GOOGLE_CLIENT_ID}
