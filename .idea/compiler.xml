@@ -8,11 +8,22 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
-        <module name="course-service" />
         <module name="profile-service" />
+        <module name="e-learning" />
         <module name="common-library" />
         <module name="identity-service" />
         <module name="notification-service" />
+      </profile>
+      <profile name="Annotation profile for course-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+        </processorPath>
+        <module name="course-service" />
       </profile>
       <profile name="Annotation profile for file-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -35,9 +46,10 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
       <module name="common-library" options="" />
-      <module name="course-service" options="-parameters" />
+      <module name="course-service" options="-parameters --add-opens java.base/java.lang=ALL-UNNAMED" />
       <module name="e-elearning" options="-parameters" />
       <module name="e-elearning (1)" options="-parameters" />
+      <module name="e-learning" options="-parameters" />
       <module name="elearning" options="-parameters" />
       <module name="file-service" options="-parameters" />
       <module name="identity-service" options="-parameters" />
