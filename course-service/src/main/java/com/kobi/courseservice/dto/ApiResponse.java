@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.ALWAYS)//non_null thi khong hien nhung null
+@JsonInclude(JsonInclude.Include.NON_NULL)//non_null thi khong hien nhung null
 public class ApiResponse<T> {
 	int status = 200; // Default status code
 	String message;
