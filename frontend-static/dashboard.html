@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang cá nhân</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f0f2f5; padding: 2em 0; }
+        .profile-card { background-color: white; padding: 2.5em; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); width: 600px; }
+        
+        .avatar-section { text-align: center; margin-bottom: 2em; }
+        .avatar-container { position: relative; width: 120px; height: 120px; margin: 0 auto; cursor: pointer; }
+        .avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .avatar-overlay { position: absolute; bottom: 0; right: 0; background-color: #1877f2; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; border: 2px solid white; transition: transform 0.2s; }
+        .avatar-container:hover .avatar-overlay { transform: scale(1.1); }
+        
+        /* Cải tiến bố cục */
+        .profile-group { margin-bottom: 2em; }
+        .profile-group h3 { font-size: 1.2em; color: #1877f2; border-bottom: 2px solid #f0f2f5; padding-bottom: 0.5em; margin-bottom: 1em; }
+        .details-grid { display: grid; grid-template-columns: 150px 1fr; gap: 1.2em; text-align: left; align-items: center; }
+        .details-grid span:first-child { font-weight: 600; color: #606770; }
+        .details-grid span:last-child { color: #1c1e21; }
+
+        #edit-mode { display: none; }
+        #edit-mode h2 { text-align: center; color: #333; margin-top: 0; margin-bottom: 1.5em; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+        .form-group { margin-bottom: 1em; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        label { display: block; margin-bottom: 0.5em; font-weight: 600; color: #606770; }
+        input, select { width: 100%; padding: 0.8em; box-sizing: border-box; border: 1px solid #dddfe2; border-radius: 6px; }
+
+        .feedback-message { padding: 1em; border-radius: 6px; text-align: center; margin-bottom: 1.5em; display: none; }
+        .feedback-message.success { background-color: #e6ffed; color: #257942; }
+        .feedback-message.error { background-color: #ffebe6; color: #c5300b; }
+        .actions { margin-top: 2.5em; text-align: center; }
+        .action-button { display: inline-block; padding: 0.8em 1.8em; background-color: #1877f2; color: white; text-decoration: none; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; transition: background-color 0.3s; margin: 0 0.5em; cursor: pointer; }
+        .action-button.secondary { background-color: #e4e6eb; color: #4b4f56; }
+        .logout-button { background: none; border: none; color: #999; cursor: pointer; font-size: 0.9em; margin-top: 2em; display: block; width: 100%; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="profile-card">
+        <div id="feedback-message" class="feedback-message"></div>
+
+        <!-- Chế độ xem Profile -->
+        <div id="view-mode">
+            <div class="avatar-section">
+                <div class="avatar-container" onclick="triggerAvatarUpload()">
+                    <img id="avatar-img" src="https://via.placeholder.com/120" alt="Avatar" class="avatar">
+                    <div class="avatar-overlay">&#x270E;</div>
+                </div>
+            </div>
+            
+            <!-- Nhóm thông tin cá nhân -->
+            <div class="profile-group">
+                <h3>Thông tin cá nhân</h3>
+                <div class="details-grid">
+                    <span>Họ và tên</span><span id="view-fullName"></span>
+                    <span>Ngày sinh</span><span id="view-dob"></span>
+                    <span>Giới tính</span><span id="view-gender"></span>
+                </div>
+            </div>
+
+            <!-- Nhóm thông tin tài khoản -->
+            <div class="profile-group">
+                <h3>Thông tin tài khoản</h3>
+                <div class="details-grid">
+                    <span>Tên đăng nhập</span><span id="view-userName"></span>
+                    <span>Email</span><span id="view-email"></span>
+                    <span>Ngôn ngữ</span><span id="view-locale"></span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="action-button" onclick="toggleEditMode(true)">Chỉnh sửa Profile</button>
+                <a href="index.html" class="action-button secondary">Tạo khóa học</a>
+            </div>
+        </div>
+
+        <!-- Chế độ sửa Profile -->
+        <div id="edit-mode">
+            <h2>Chỉnh sửa thông tin</h2>
+            <form id="edit-profile-form">
+                <div class="form-grid">
+                    <div class="form-group"><label for="firstName">Tên</label><input type="text" id="firstName" name="firstName"></div>
+                    <div class="form-group"><label for="lastName">Họ</label><input type="text" id="lastName" name="lastName"></div>
+                    <div class="form-group full-width"><label for="fullName">Tên đầy đủ</label><input type="text" id="fullName" name="fullName"></div>
+                    <div class="form-group"><label for="dob">Ngày sinh</label><input type="date" id="dob" name="dob"></div>
+                    <div class="form-group"><label for="gender">Giới tính</label><select id="gender" name="gender"><option value="MALE">Nam</option><option value="FEMALE">Nữ</option><option value="OTHER">Khác</option></select></div>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="action-button">Lưu thay đổi</button>
+                    <button type="button" class="action-button secondary" onclick="toggleEditMode(false)">Hủy</button>
+                </div>
+            </form>
+        </div>
+
+        <button class="logout-button" onclick="logout()">Đăng xuất</button>
+        <input type="file" id="avatar-upload-input" accept="image/*" style="display: none;">
+    </div>
+
+    <script>
+        const PROFILE_API_URL = 'http://localhost:8888/api/profile';
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) window.location.href = 'auth.html';
+
+        const viewMode = document.getElementById('view-mode');
+        const editMode = document.getElementById('edit-mode');
+        const avatarUploadInput = document.getElementById('avatar-upload-input');
+        const feedbackDiv = document.getElementById('feedback-message');
+
+        function showFeedback(message, isSuccess) {
+            feedbackDiv.textContent = message;
+            feedbackDiv.className = `feedback-message ${isSuccess ? 'success' : 'error'}`;
+            feedbackDiv.style.display = 'block';
+            window.scrollTo(0, 0);
+            setTimeout(() => { feedbackDiv.style.display = 'none'; }, 3000);
+        }
+
+        async function populateProfileData() {
+            try {
+                const response = await fetch(`${PROFILE_API_URL}/me`, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+                if (response.status === 401 || response.status === 403) return logout();
+                const result = await response.json();
+
+                if (response.ok && result.data) {
+                    const profile = result.data;
+                    document.getElementById('avatar-img').src = profile.avatar || 'https://via.placeholder.com/120';
+                    document.getElementById('view-fullName').textContent = profile.fullName || 'Chưa cập nhật';
+                    document.getElementById('view-dob').textContent = profile.dob ? new Date(profile.dob).toLocaleDateString('vi-VN') : 'Chưa cập nhật';
+                    document.getElementById('view-gender').textContent = profile.gender || 'Chưa cập nhật';
+                    document.getElementById('view-userName').textContent = profile.userName || 'N/A';
+                    document.getElementById('view-email').textContent = profile.email || 'N/A';
+                    document.getElementById('view-locale').textContent = profile.locale || 'N/A';
+
+                    document.getElementById('firstName').value = profile.firstName || '';
+                    document.getElementById('lastName').value = profile.lastName || '';
+                    document.getElementById('fullName').value = profile.fullName || '';
+                    document.getElementById('dob').value = profile.dob || '';
+                    document.getElementById('gender').value = profile.gender || 'MALE';
+                } else {
+                    showFeedback(result.message || 'Không thể tải Profile.', false);
+                }
+            } catch (error) {
+                showFeedback('Lỗi kết nối. Không thể tải thông tin.', false);
+            }
+        }
+
+        function toggleEditMode(showEdit) {
+            viewMode.style.display = showEdit ? 'none' : 'block';
+            editMode.style.display = showEdit ? 'block' : 'none';
+        }
+
+        function triggerAvatarUpload() { avatarUploadInput.click(); }
+
+        avatarUploadInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${PROFILE_API_URL}/upload`, { method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}` }, body: formData });
+                if (response.ok) {
+                    showFeedback('Cập nhật avatar thành công!', true);
+                    await populateProfileData();
+                } else {
+                    const err = await response.json();
+                    showFeedback(err.message || 'Upload avatar thất bại!', false);
+                }
+            } catch (error) {
+                showFeedback('Đã có lỗi xảy ra khi upload.', false);
+            }
+        });
+
+        document.getElementById('edit-profile-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const profileData = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch(`${PROFILE_API_URL}/update`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+                    body: JSON.stringify(profileData)
+                });
+
+                if (response.ok) {
+                    showFeedback('Cập nhật thông tin thành công!', true);
+                    await populateProfileData();
+                    toggleEditMode(false);
+                } else {
+                    const err = await response.json();
+                    showFeedback(err.message || 'Cập nhật thông tin thất bại!', false);
+                }
+            } catch (error) {
+                showFeedback('Đã có lỗi xảy ra khi cập nhật.', false);
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            window.location.href = 'auth.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', populateProfileData);
+    </script>
+
+</body>
+</html>

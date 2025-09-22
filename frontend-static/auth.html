@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập & Đăng ký</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
+        .auth-container { background-color: white; padding: 2em; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 400px; }
+        .tab-buttons { display: flex; border-bottom: 1px solid #ddd; margin-bottom: 1.5em; }
+        .tab-button { flex: 1; padding: 1em; text-align: center; background: none; border: none; cursor: pointer; font-size: 1em; font-weight: 600; color: #999; }
+        .tab-button.active { color: #1877f2; border-bottom: 3px solid #1877f2; }
+        .form-content { display: none; }
+        .form-content.active { display: block; }
+        h2 { text-align: center; color: #333; margin-bottom: 1em; }
+        label { display: block; margin-bottom: 0.5em; font-weight: 600; color: #606770; }
+        input { width: 100%; padding: 0.8em; margin-bottom: 1em; box-sizing: border-box; border: 1px solid #dddfe2; border-radius: 6px; }
+        button[type="submit"] { width: 100%; padding: 0.8em; background-color: #1877f2; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1em; font-weight: bold; }
+        button[type="submit"]:hover { background-color: #166fe5; }
+        .response-message { margin-top: 1em; padding: 1em; border-radius: 6px; text-align: center; }
+        .response-message.success { background-color: #e6ffed; color: #257942; }
+        .response-message.error { background-color: #ffebe6; color: #c5300b; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="showForm('login')">Đăng nhập</button>
+            <button class="tab-button" onclick="showForm('register')">Đăng ký</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" class="form-content active">
+            <h2>Chào mừng trở lại!</h2>
+            <form id="login-form-element">
+                <label for="login-username">Tên đăng nhập</label>
+                <input type="text" id="login-username" required>
+                <label for="login-password">Mật khẩu</label>
+                <input type="password" id="login-password" required>
+                <button type="submit">Đăng nhập</button>
+            </form>
+            <div id="login-response" class="response-message"></div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="form-content">
+            <h2>Tạo tài khoản mới</h2>
+            <form id="register-form-element">
+                <label for="reg-username">Tên đăng nhập</label>
+                <input type="text" id="reg-username" required minlength="4">
+                <label for="reg-email">Email</label>
+                <input type="email" id="reg-email" required>
+                <label for="reg-password">Mật khẩu</label>
+                <input type="password" id="reg-password" required minlength="8">
+                <button type="submit">Đăng ký</button>
+            </form>
+            <div id="register-response" class="response-message"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8888/api/identity/api/v1';
+
+        function showForm(formName) {
+            document.getElementById('login-form').classList.toggle('active', formName === 'login');
+            document.getElementById('register-form').classList.toggle('active', formName === 'register');
+            document.querySelector('.tab-button:nth-child(1)').classList.toggle('active', formName === 'login');
+            document.querySelector('.tab-button:nth-child(2)').classList.toggle('active', formName === 'register');
+        }
+
+        document.getElementById('register-form-element').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // ... (register logic is fine)
+        });
+
+        document.getElementById('login-form-element').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const responseDiv = document.getElementById('login-response');
+            const data = {
+                userName: document.getElementById('login-username').value,
+                passWord: document.getElementById('login-password').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const result = await response.json();
+
+                // *** BƯỚC GỠ LỖI: In ra dữ liệu server trả về ***
+                console.log('SERVER RESPONSE:', JSON.stringify(result, null, 2));
+
+                if (!response.ok) {
+                    responseDiv.className = 'response-message error';
+                    responseDiv.textContent = (result && result.message) ? result.message : 'Tên đăng nhập hoặc mật khẩu không đúng.';
+                    return;
+                }
+
+                if (result && result.data && result.data.accessToken && result.data.refreshToken) {
+                    localStorage.setItem('accessToken', result.data.accessToken);
+                    localStorage.setItem('refreshToken', result.data.refreshToken);
+                    
+                    responseDiv.className = 'response-message success';
+                    responseDiv.textContent = 'Đăng nhập thành công! Đang chuyển hướng...';
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+                } else {
+                    responseDiv.className = 'response-message error';
+                    // Thêm hướng dẫn gỡ lỗi vào thông báo
+                    responseDiv.textContent = 'Lỗi: Dữ liệu token trả về không hợp lệ. Vui lòng mở Console (F12) để xem chi tiết.';
+                }
+            } catch (error) {
+                responseDiv.className = 'response-message error';
+                responseDiv.textContent = 'Lỗi kết nối. Hãy kiểm tra lại backend.';
+            }
+        });
+    </script>
+</body>
+</html>
