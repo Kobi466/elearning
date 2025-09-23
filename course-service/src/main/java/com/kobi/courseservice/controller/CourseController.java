@@ -1,6 +1,7 @@
 package com.kobi.courseservice.controller;
 
 import com.kobi.courseservice.dto.ApiResponse;
+import com.kobi.courseservice.dto.PageResponse;
 import com.kobi.courseservice.dto.request.CreatedCourseRequest;
 import com.kobi.courseservice.dto.request.UpdateCourseRequest;
 import com.kobi.courseservice.dto.request.UploadThumbnailRequest;
@@ -12,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,7 +24,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1")
 public class CourseController {
     CourseService courseService;
-
+/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
+    /**
+     * Returns a page of courses with status PUBLISHED.
+     * @param pageable the pageable.
+     * @return a page of courses.
+     */
+/* <<<<<<<<<<  85f9653f-b504-4835-a051-12681c2b8432  >>>>>>>>>>> */
+    @GetMapping
+    ApiResponse<PageResponse<CourseResponse>> getAllCoursesByPublish(Pageable pageable){
+        return ApiResponse.ok( courseService.getAllCourseStatusPublish(pageable), SuccessCode.GET_COURSE_SUCCESS);
+    }
     @PostMapping("/created")
     public ApiResponse<CreatedCourseResponse> createCourse(@Valid @RequestBody CreatedCourseRequest request) {
         return ApiResponse.ok(courseService.createCourse(request), SuccessCode.CREATED_COURSE);

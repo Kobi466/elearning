@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,7 +30,7 @@ import java.io.IOException;
 @EnableMethodSecurity
 public class SecurityConfig {
 	private static final String[] PUBLIC_URLS = {
-
+        "/v1"
 	};
 
 	CustomJwtDecoder jwtDecoder;
@@ -37,7 +38,7 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(requests ->
 				requests
-						.requestMatchers(PUBLIC_URLS)
+						.requestMatchers(HttpMethod.GET, PUBLIC_URLS)
 						.permitAll()
 						.anyRequest()
 						.authenticated()

@@ -1,5 +1,6 @@
 package com.kobi.courseservice.service;
 
+import com.kobi.courseservice.dto.PageResponse;
 import com.kobi.courseservice.dto.request.CreatedCourseRequest;
 import com.kobi.courseservice.dto.request.UpdateCourseRequest;
 import com.kobi.courseservice.dto.request.UploadThumbnailRequest;
@@ -14,11 +15,17 @@ import com.kobi.courseservice.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +35,30 @@ public class CourseService {
     CourseRepository courseRepository;
     CourseMapper courseMapper;
 
+/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
+    /**
+     * Returns a page of courses with status PUBLISHED.
+     * @param pageable the pageable.
+     * @return a page of courses.
+     */
+/* <<<<<<<<<<  4435fa45-0780-4269-be78-555a368d295f  >>>>>>>>>>> */
+    public PageResponse<CourseResponse> getAllCourseStatusPublish(Pageable pageable) {
+        Page<Course> coursePage = courseRepository.findCourseByStatus(CourseStatus.PUBLISHED, pageable);
+
+        List<CourseResponse> courseResponses = coursePage.getContent()
+                .stream()
+                .map(courseMapper::toResponse)
+                .collect((Collectors.toList()));
+
+        return PageResponse.<CourseResponse>builder()
+                .content(courseResponses)
+                .pageNo(coursePage.getNumber())
+                .pageSize(coursePage.getSize())
+                .totalElement(coursePage.getTotalElements())
+                .totalPages(coursePage.getTotalPages())
+                .last(coursePage.isLast())
+                .build();
+    }
     @PreAuthorize("hasRole('ADMIN')")
     public CreatedCourseResponse createCourse(CreatedCourseRequest createdCourseRequest) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
