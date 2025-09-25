@@ -18,4 +18,13 @@ public interface CourseRepository extends JpaRepository<Course, String> {
      */
 /* <<<<<<<<<<  2bec16ea-6d71-4ff4-8c15-b47fefb3704e  >>>>>>>>>>> */
     Page<Course> findCourseByStatus(CourseStatus status, Pageable pageable);
+
+    /**
+     * Retrieves a paginated list of courses associated with a specific user ID.
+     *
+     * @param userId the ID of the user whose courses are to be retrieved.
+     * @param pageable the pagination information including page number, size, and sorting.
+     * @return a page containing the courses associated with the specified user ID.
+     */
+    Page<Course> getCourseByUserId(String userId, Pageable pageable);
 }

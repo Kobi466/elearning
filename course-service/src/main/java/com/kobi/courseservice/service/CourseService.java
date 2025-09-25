@@ -59,6 +59,30 @@ public class CourseService {
                 .last(coursePage.isLast())
                 .build();
     }
+
+    /**
+     * Retrieves a paginated list of courses belonging to the authenticated user.
+     * The method ensures that only users with the role 'ADMIN' can access this functionality.
+     *
+     * @param pageable the pagination information including page number, size, and sorting
+     * @return a paginated response containing the courses of the authenticated user
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    public PageResponse<CourseResponse> getCourseMy(Pageable pageable){
+        Page<Course> coursePage = courseRepository.getCourseByUserId(getUserId(), pageable);
+        List<CourseResponse> courseResponses = coursePage.getContent()
+                .stream()
+                .map(courseMapper::toResponse)
+                .collect(Collectors.toList());
+        return PageResponse.<CourseResponse>builder()
+                .content(courseResponses)
+                .pageNo(coursePage.getNumber())
+                .pageSize(coursePage.getSize())
+                .totalElement(coursePage.getTotalElements())
+                .totalPages(coursePage.getTotalPages())
+                .build();
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     public CreatedCourseResponse createCourse(CreatedCourseRequest createdCourseRequest) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();

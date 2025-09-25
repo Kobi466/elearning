@@ -7,7 +7,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 public enum SuccessCode {
-    GET_COURSE_SUCCESS(200, "Get course success", HttpStatus.OK),
+    GET_MY_COURSE_SUCCESS(200, "Get all my course success", HttpStatus.OK),
+    GET_COURSE_PUBLISH_SUCCESS(200, "Get all course publish success", HttpStatus.OK),
 	UPLOAD_SUCCESS(200, "Upload success", HttpStatus.OK),
     CREATED_COURSE(201, "Created course", HttpStatus.CREATED),
     UPDATED_COURSE(202, "Updated course", HttpStatus.OK),
