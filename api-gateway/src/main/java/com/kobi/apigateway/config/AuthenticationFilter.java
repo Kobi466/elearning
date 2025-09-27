@@ -41,6 +41,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     @NonFinal
     String[] publicApi = {
             "/course/v1",
+            "/course/v1/getCourse",
             "/identity/api/v1/auth/.*",
             "/identity/api/v1/users/register"
     };

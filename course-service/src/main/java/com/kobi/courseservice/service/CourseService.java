@@ -83,6 +83,21 @@ public class CourseService {
                 .build();
     }
 
+    public PageResponse<CourseResponse> getCourseWithStatusByUserId(String userId, Pageable pageable){
+        Page<Course> coursePage = courseRepository.findCourseByUserIdAndStatus(userId, CourseStatus.PUBLISHED, pageable);
+        List<CourseResponse> courseResponses = coursePage.getContent()
+                .stream()
+                .map(courseMapper::toResponse)
+                .collect(Collectors.toList());
+        return PageResponse.<CourseResponse>builder()
+                .content(courseResponses)
+                .pageNo(coursePage.getNumber())
+                .pageSize(coursePage.getSize())
+                .totalElement(coursePage.getTotalElements())
+                .totalPages(coursePage.getTotalPages())
+                .build();
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     public CreatedCourseResponse createCourse(CreatedCourseRequest createdCourseRequest) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();

@@ -27,4 +27,6 @@ public interface CourseRepository extends JpaRepository<Course, String> {
      * @return a page containing the courses associated with the specified user ID.
      */
     Page<Course> getCourseByUserId(String userId, Pageable pageable);
+
+    Page<Course> findCourseByUserIdAndStatus(String userId, CourseStatus status, Pageable pageable);
 }
