@@ -7,12 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="e-learning" />
         <module name="api-gateway" />
         <module name="profile-service" />
-        <module name="e-learning" />
         <module name="common-library" />
         <module name="identity-service" />
         <module name="notification-service" />
+        <module name="enrollment-service" />
       </profile>
       <profile name="Annotation profile for course-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -51,6 +52,7 @@
       <module name="e-elearning (1)" options="-parameters" />
       <module name="e-learning" options="-parameters" />
       <module name="elearning" options="-parameters" />
+      <module name="enrollment-service" options="-parameters" />
       <module name="file-service" options="-parameters" />
       <module name="identity-service" options="-parameters" />
       <module name="notification" options="-parameters" />
