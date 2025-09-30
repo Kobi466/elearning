@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class Course {
     String title;
     String description;
     String thumbnailUrl;
+    BigDecimal price;
     String userId;
     @Enumerated(EnumType.STRING)
     CourseStatus status;

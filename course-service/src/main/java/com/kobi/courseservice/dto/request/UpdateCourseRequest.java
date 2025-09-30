@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -16,4 +18,5 @@ public class UpdateCourseRequest {
     @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
     String title;
     String description;
+    BigDecimal price;
 }

@@ -119,6 +119,7 @@ public class CourseService {
     public CourseResponse updateCourse(String courseId, UpdateCourseRequest request) {
         var course = this.getCourseById(courseId);
         courseMapper.updateEntity(course, request);
+        course.setUpdatedAt(LocalDateTime.now());
         return courseMapper.toResponse(courseRepository.save(course));
     }
 
@@ -139,6 +140,7 @@ public class CourseService {
     public CourseResponse publishCourse(String courseId) {
         var course = this.getCourseById(courseId);
         course.setStatus(CourseStatus.PUBLISHED);
+        course.setUpdatedAt(LocalDateTime.now());
         return courseMapper.toResponse(courseRepository.save(course));
     }
 

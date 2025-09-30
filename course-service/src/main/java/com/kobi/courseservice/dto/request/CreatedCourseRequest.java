@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.validator.constraints.URL;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -24,4 +26,5 @@ public class CreatedCourseRequest {
     // Nó không bắt buộc, giảng viên có thể cập nhật sau
     @URL(message = "URL ảnh bìa không hợp lệ")
     String thumbnailUrl;
+    BigDecimal price;
 }
