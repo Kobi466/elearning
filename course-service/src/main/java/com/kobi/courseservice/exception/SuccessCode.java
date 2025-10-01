@@ -19,8 +19,8 @@ public enum SuccessCode {
     CREATED_LESSON(207, "Created lesson", HttpStatus.CREATED),
     UPDATED_LESSON(208, "Updated lesson", HttpStatus.OK),
     DELETED_LESSON(209, "Deleted lesson", HttpStatus.OK),
-    GET_MY_COURSE_PUBLISHES(210, "Get all my course publishes", HttpStatus.OK)
-	;
+    GET_MY_COURSE_PUBLISHES(210, "Get all my course publishes", HttpStatus.OK),
+    GET_COURSE_SUCCESS(211, "Get course success", HttpStatus.OK);
 
 	private final int status;
 	private final String message;

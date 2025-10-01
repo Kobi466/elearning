@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -15,15 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class CourseResponse {
+public class SectionResponse {
     String id;
     String title;
-    String description;
-    BigDecimal price;
-    String thumbnailUrl;
-    String userId;
-    String status;
-    List<SectionResponse> sections;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    int oderIndex;
+    List<LessonResponse> lessons;
 }

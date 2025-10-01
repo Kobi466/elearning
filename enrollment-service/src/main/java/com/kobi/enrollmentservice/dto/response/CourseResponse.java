@@ -1,4 +1,4 @@
-package com.kobi.courseservice.dto.response;
+package com.kobi.enrollmentservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

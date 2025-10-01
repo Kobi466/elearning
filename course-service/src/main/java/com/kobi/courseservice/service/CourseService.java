@@ -35,13 +35,20 @@ public class CourseService {
     CourseRepository courseRepository;
     CourseMapper courseMapper;
 
-/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
-    /**
-     * Returns a page of courses with status PUBLISHED.
-     * @param pageable the pageable.
-     * @return a page of courses.
-     */
-/* <<<<<<<<<<  4435fa45-0780-4269-be78-555a368d295f  >>>>>>>>>>> */
+    public CourseResponse getCourse(String courseId) {
+        var course = courseRepository.findCourseDetailsById(courseId);
+        if (course.isEmpty()||course.get().getStatus()==CourseStatus.DRAFT)
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND);
+        return courseMapper.toResponse(course.get());
+    }
+
+    public List<CourseResponse> getCourseByIds(List<String> courseIds) {
+        List<Course> courses = courseRepository.findAllById(courseIds);
+        return courses.stream()
+                .map(courseMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
     public PageResponse<CourseResponse> getAllCourseStatusPublish(Pageable pageable) {
         Page<Course> coursePage = courseRepository.findCourseByStatus(CourseStatus.PUBLISHED, pageable);
 
@@ -60,13 +67,6 @@ public class CourseService {
                 .build();
     }
 
-    /**
-     * Retrieves a paginated list of courses belonging to the authenticated user.
-     * The method ensures that only users with the role 'ADMIN' can access this functionality.
-     *
-     * @param pageable the pagination information including page number, size, and sorting
-     * @return a paginated response containing the courses of the authenticated user
-     */
     @PreAuthorize("hasRole('ADMIN')")
     public PageResponse<CourseResponse> getCourseMy(Pageable pageable){
         Page<Course> coursePage = courseRepository.getCourseByUserId(getUserId(), pageable);

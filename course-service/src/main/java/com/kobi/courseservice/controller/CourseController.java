@@ -29,27 +29,12 @@ public class CourseController {
     ApiResponse<PageResponse<CourseResponse>> getCourseWithStatusByUser(@RequestParam String userId, Pageable pageable){
         return ApiResponse.ok(courseService.getCourseWithStatusByUserId(userId, pageable), SuccessCode.GET_MY_COURSE_SUCCESS);
     }
-/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
-    /**
-     * Returns a page of courses with status PUBLISHED.
-     * @param pageable the pageable.
-     * @return a page of courses.
-     */
-/* <<<<<<<<<<  85f9653f-b504-4835-a051-12681c2b8432  >>>>>>>>>>> */
+
     @GetMapping
     ApiResponse<PageResponse<CourseResponse>> getAllCoursesByPublish(Pageable pageable){
         return ApiResponse.ok( courseService.getAllCourseStatusPublish(pageable), SuccessCode.GET_COURSE_PUBLISH_SUCCESS);
     }
 
-/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
-    /**
-     * Retrieves a paginated list of courses belonging to the authenticated user.
-     * The method ensures that only users with the role 'ADMIN' can access this functionality.
-     *
-     * @param pageable the pagination information including page number, size, and sorting
-     * @return a paginated response containing the courses of the authenticated user
-     */
-/* <<<<<<<<<<  e9646c9d-6395-489c-bbec-1cde98e6d706  >>>>>>>>>>> */
     @GetMapping("/my")
     ApiResponse<PageResponse<CourseResponse>> getCourseMy(Pageable pageable){
         return ApiResponse.ok(courseService.getCourseMy(pageable), SuccessCode.GET_MY_COURSE_SUCCESS);

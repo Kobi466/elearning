@@ -1,5 +1,6 @@
 package com.kobi.courseservice.dto.response;
 
+import com.kobi.courseservice.entity.enums.ContentType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,15 +16,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class CourseResponse {
+public class LessonResponse {
     String id;
     String title;
-    String description;
-    BigDecimal price;
-    String thumbnailUrl;
-    String userId;
-    String status;
-    List<SectionResponse> sections;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    String contentType;
+    String contentUrl;
+    int durationInSeconds;
+    int orderIndex;
 }
