@@ -1,18 +1,17 @@
 server:
-  port: 8085
+  port: 8086
   servlet:
-    context-path: /course
+    context-path: /enrollment
+
 spring:
-  profiles:
-    active: dev
   application:
-    name: course-service
+    name: enrollment-service
   datasource:
     url: ${URL}
     username: ${USER_NAME}
     password: ${PASS_WORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    show-sql: true
     hibernate:
       ddl-auto: update
+    show-sql: true

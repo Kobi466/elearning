@@ -3,6 +3,8 @@ server:
   servlet:
     context-path: /profile
 spring:
+    profiles:
+        active: dev
     application:
         name: profile-service
     neo4j:

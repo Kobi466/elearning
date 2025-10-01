@@ -4,6 +4,8 @@ server:
         context-path: /identity
 
 spring:
+    profiles:
+      active: dev
     datasource:
       url: ${DBMS_CONNECTION}
       driverClassName: com.mysql.cj.jdbc.Driver

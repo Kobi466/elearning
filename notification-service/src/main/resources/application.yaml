@@ -3,6 +3,8 @@ server:
   servlet:
     context-path: /notification
 spring:
+  profiles:
+    active: dev
   application:
     name: notification-service
   kafka:
@@ -16,8 +18,8 @@ spring:
         spring.json.trusted.packages: "*"
 notification:
   email:
-    brevo-url: ${brevo_url}
-    brevo-api-key: ${brevo_api_key}
+    brevo-url: ${BREVO_URL}
+    brevo-api-key: ${BREVO_API_KEY}
   sender:
-    name: ${sender_name}
-    email: ${sender_email}
+    name: ${SENDER_NAME}
+    email: ${SENDER_EMAIL}
