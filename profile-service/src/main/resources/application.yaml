@@ -3,61 +3,61 @@ server:
   servlet:
     context-path: /profile
 spring:
-    profiles:
-        active: dev
-    application:
-        name: profile-service
-    neo4j:
-      uri: bolt://localhost:7687
-      authentication:
-        username: ${NEO4J_USERNAME}
-        password: ${NEO4J_PASSWORD}
+  profiles:
+      active: dev
+  application:
+      name: profile-service
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: ${NEO4J_USERNAME}
+      password: ${NEO4J_PASSWORD}
 
-        # --- Cấu hình Kafka ---
-    kafka:
-      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-      consumer:
-        # 1. ĐỘ TIN CẬY & XỬ LÝ LỖI (Quan trọng nhất)
-        group-id: profile-service-group # Tên group-id rõ ràng, không đổi
-        auto-offset-reset: earliest
-        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-        value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-        properties:
-          # Không hardcode, sử dụng biến môi trường cho mọi môi trường (dev, staging, prod)
-          schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
-          specific.avro.reader: true
-          # Tinh chỉnh session timeout để tránh rebalance không cần thiết
-          session.timeout.ms: 45000
-      producer:
-        key-serializer: org.apache.kafka.common.serialization.StringSerializer
-        value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      # --- Cấu hình Kafka ---
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      # 1. ĐỘ TIN CẬY & XỬ LÝ LỖI (Quan trọng nhất)
+      group-id: profile-service-group # Tên group-id rõ ràng, không đổi
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        # Không hardcode, sử dụng biến môi trường cho mọi môi trường (dev, staging, prod)
+        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+        specific.avro.reader: true
+        # Tinh chỉnh session timeout để tránh rebalance không cần thiết
+        session.timeout.ms: 45000
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-      listener:
-        # Xử lý message theo batch để tăng hiệu năng
-        type: batch
-        # Chế độ acknowledge phổ biến nhất: Spring tự commit offset sau khi cả batch được xử lý thành công
-        ack-mode: batch
-        # 2. HIỆU NĂNG & SCALABILITY
-        # Chạy 3 consumer thread trên 1 instance của service.
-        # Nếu topic có 6 partition, bạn có thể chạy 2 instance của service này để xử lý song song.
-        concurrency: 3
-        # Số message tối đa consumer lấy về trong một lần poll
-        max-poll-records: 100
+    listener:
+      # Xử lý message theo batch để tăng hiệu năng
+      type: batch
+      # Chế độ acknowledge phổ biến nhất: Spring tự commit offset sau khi cả batch được xử lý thành công
+      ack-mode: batch
+      # 2. HIỆU NĂNG & SCALABILITY
+      # Chạy 3 consumer thread trên 1 instance của service.
+      # Nếu topic có 6 partition, bạn có thể chạy 2 instance của service này để xử lý song song.
+      concurrency: 3
+      # Số message tối đa consumer lấy về trong một lần poll
+      max-poll-records: 100
 
-      # Cấu hình Retry và Dead Letter Topic (DLT)
-      # Khi xử lý lỗi, thử lại 2 lần. Nếu vẫn lỗi, đẩy message vào topic DLT để phân tích sau.
-      # Điều này giúp service không bị kẹt ở message lỗi và tiếp tục xử lý các message mới.
-      dlt:
-        enabled: true
-        # Tên topic chứa các message lỗi
-        topic: user-created.DLT
-        # Thêm header vào message lỗi để biết nguồn gốc
-        add-headers-to-dl-message: true
+    # Cấu hình Retry và Dead Letter Topic (DLT)
+    # Khi xử lý lỗi, thử lại 2 lần. Nếu vẫn lỗi, đẩy message vào topic DLT để phân tích sau.
+    # Điều này giúp service không bị kẹt ở message lỗi và tiếp tục xử lý các message mới.
+    dlt:
+      enabled: true
+      # Tên topic chứa các message lỗi
+      topic: user-created.DLT
+      # Thêm header vào message lỗi để biết nguồn gốc
+      add-headers-to-dl-message: true
 
-      # 3. BẢO MẬT (Ví dụ cho môi trường Production)
-      # properties:
-      #   security.protocol: SASL_SSL
-      #   sasl.mechanism: PLAIN
-      #   sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required \
-      #     username="${KAFKA_USERNAME}" \
-      #     password="${KAFKA_PASSWORD}";
+    # 3. BẢO MẬT (Ví dụ cho môi trường Production)
+    # properties:
+    #   security.protocol: SASL_SSL
+    #   sasl.mechanism: PLAIN
+    #   sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required \
+    #     username="${KAFKA_USERNAME}" \
+    #     password="${KAFKA_PASSWORD}";
