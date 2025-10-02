@@ -33,6 +33,9 @@ public class ProfileService {
     ProfileMapper profileMapper;
     FileClient fileClient;
 
+    public List<ProfileResponse> getProfilesByIds(List<String> ids) {
+        return profileRepository.findAllById(ids).stream().map(profileMapper::toProfileResponse).toList();
+    }
     // *** SỬA LỖI 1: Xử lý an toàn các trường null khi tạo profile từ Kafka event ***
     public void createProfileFromPayload(UserPayload payload){
         Profile profile = Profile.builder()

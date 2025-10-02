@@ -1,4 +1,4 @@
-package com.kobi.profileservice.dto.repsonse;
+package com.kobi.reviewservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
