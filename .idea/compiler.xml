@@ -8,9 +8,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="e-learning" />
         <module name="api-gateway" />
         <module name="profile-service" />
+        <module name="e-learning" />
         <module name="common-library" />
         <module name="identity-service" />
         <module name="notification-service" />
@@ -47,6 +47,15 @@
         </processorPath>
         <module name="enrollment-service" />
       </profile>
+      <profile name="Annotation profile for progress-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.40/lombok-1.18.40.jar" />
+        </processorPath>
+        <module name="progress-service" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="e-elearning" target="21" />
@@ -70,6 +79,7 @@
       <module name="notification" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="profile-service" options="-parameters" />
+      <module name="progress-service" options="-parameters" />
     </option>
   </component>
 </project>

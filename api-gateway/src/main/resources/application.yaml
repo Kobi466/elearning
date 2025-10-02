@@ -39,5 +39,11 @@ spring:
              - Path=${app.api-prefix}/enrollment/**
             filters:
               - StripPrefix= 1
+          - id: progress-service
+            uri: http://localhost:8087
+            predicates:
+              - Path=${app.api-prefix}/progress/**
+            filters:
+              - StripPrefix= 1
 app:
   api-prefix: /api
