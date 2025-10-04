@@ -1,0 +1,18 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /payment
+spring:
+  profiles:
+    active: dev
+  application:
+    name: payment-service
+  datasource:
+    url: ${URL}
+    username: ${USER_NAME}
+    password: ${PASS_WORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
