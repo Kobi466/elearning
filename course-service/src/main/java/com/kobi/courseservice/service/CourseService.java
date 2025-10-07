@@ -1,6 +1,7 @@
 package com.kobi.courseservice.service;
 
 import com.kobi.courseservice.dto.PageResponse;
+import com.kobi.courseservice.dto.request.CoursePriceResponse;
 import com.kobi.courseservice.dto.request.CreatedCourseRequest;
 import com.kobi.courseservice.dto.request.UpdateCourseRequest;
 import com.kobi.courseservice.dto.request.UploadThumbnailRequest;
@@ -40,6 +41,15 @@ public class CourseService {
         if (course.isEmpty()||course.get().getStatus()==CourseStatus.DRAFT)
             throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         return courseMapper.toResponse(course.get());
+    }
+        public CoursePriceResponse getCoursePrice(String courseId) {
+        var course = courseRepository.findCourseDetailsById(courseId);
+        if (course.isEmpty()||course.get().getStatus()==CourseStatus.DRAFT)
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND);
+        return CoursePriceResponse.builder()
+                .courseId(course.get().getId())
+                .price(course.get().getPrice())
+                .build();
     }
 
     public List<CourseResponse> getCourseByIds(List<String> courseIds) {

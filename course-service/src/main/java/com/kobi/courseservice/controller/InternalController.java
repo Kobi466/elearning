@@ -1,6 +1,7 @@
 package com.kobi.courseservice.controller;
 
 import com.kobi.courseservice.dto.ApiResponse;
+import com.kobi.courseservice.dto.request.CoursePriceResponse;
 import com.kobi.courseservice.dto.response.CourseResponse;
 import com.kobi.courseservice.exception.SuccessCode;
 import com.kobi.courseservice.service.CourseService;
@@ -21,6 +22,10 @@ public class InternalController {
     @GetMapping("/{courseId}")
     ApiResponse<CourseResponse> getCourse(@PathVariable String courseId){
         return ApiResponse.ok(courseService.getCourse(courseId), SuccessCode.GET_COURSE_SUCCESS);
+    }
+    @GetMapping("/price/{courseId}")
+    ApiResponse<CoursePriceResponse> getCoursePrice(@PathVariable String courseId){
+        return ApiResponse.ok(courseService.getCoursePrice(courseId), SuccessCode.GET_COURSE_SUCCESS);
     }
     @PostMapping("/get-by-ids")
     ApiResponse<List<CourseResponse>> getCourseByIds(@RequestBody List<String> courseIds){
