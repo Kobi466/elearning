@@ -30,8 +30,6 @@ import java.io.IOException;
 @EnableMethodSecurity
 public class SecurityConfig {
 	private static final String[] PUBLIC_URLS = {
-        "/v1",
-            "/v1/{userId}"
 	};
 
 	CustomJwtDecoder jwtDecoder;

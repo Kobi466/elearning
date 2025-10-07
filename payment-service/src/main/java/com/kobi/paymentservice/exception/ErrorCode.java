@@ -8,7 +8,8 @@ public enum ErrorCode {
 	VALIDATION_ERROR(204, "Validation error", HttpStatus.BAD_REQUEST),
 	AUTHENTICATION_FAILED(207, "Authentication failed", HttpStatus.UNAUTHORIZED),
 	COURSE_NO_FREE(208, "This course requires payment", HttpStatus.BAD_REQUEST),
-	REGISTERED(209,"You have already enrolled in this course", HttpStatus.BAD_REQUEST)
+	REGISTERED(209,"You have already enrolled in this course", HttpStatus.BAD_REQUEST),
+	COURSE_NOT_FOUND(210, "Course not found", HttpStatus.NOT_FOUND)
     ;
 
 	private final int status;

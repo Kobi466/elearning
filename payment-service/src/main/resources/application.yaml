@@ -1,5 +1,5 @@
 server:
-  port: 8084
+  port: 8089
   servlet:
     context-path: /payment
 spring:
@@ -16,3 +16,8 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+vnpay:
+  tmnCode: ${VNPAY_TMNCODE}
+  hashSecret: ${VNPAY_HASHSECRET}
+  url: ${VNPAY_URL}
+  returnUrl: ${VNPAY_RETURNURL}

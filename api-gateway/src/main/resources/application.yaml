@@ -51,5 +51,11 @@ spring:
               - Path=${app.api-prefix}/review/**
             filters:
               - StripPrefix= 1
+          - id: payment-service
+            uri: http://localhost:8089
+            predicates:
+              - Path=${app.api-prefix}/payment/**
+            filters:
+              - StripPrefix= 1
 app:
   api-prefix: /api

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     @Column(nullable = false)
     String userId;
@@ -29,8 +29,8 @@ public class Order {
     @Column(nullable = false)
     OrderStatus status;
     @Column(nullable = false, unique = true)
-    String orderRef;
-    String gatewayTransId;
+    String orderRef;//vnp_TxnRef
+    String gatewayTransId;//vnp_TransactionNo
     @Column(nullable = false)
     String paymentGateway;
     LocalDateTime createdAt;
