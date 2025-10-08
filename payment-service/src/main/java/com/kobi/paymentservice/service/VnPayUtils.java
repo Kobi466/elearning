@@ -58,4 +58,22 @@ public class VnPayUtils {
         String vnp_SecureHash = hmacSHA512(hashSecret, hashData.toString());
         return query.toString() + "&vnp_SecureHash=" + vnp_SecureHash;
     }
+
+    // Thêm hàm này vào lớp VnpayUtils.java
+    public static String getHashData(Map<String, String> vnp_Params) {
+        List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder hashData = new StringBuilder();
+        for (String fieldName : fieldNames) {
+            String fieldValue = vnp_Params.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                hashData.append(fieldName);
+                hashData.append('=');
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8));
+                hashData.append('&');
+            }
+        }
+        hashData.setLength(hashData.length() - 1); // remove last &
+        return hashData.toString();
+    }
 }

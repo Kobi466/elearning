@@ -27,6 +27,7 @@ public class Order {
     @Column(nullable = false)
     BigDecimal amount;
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     OrderStatus status;
     @Column(nullable = false, unique = true)
     String orderRef;//vnp_TxnRef
