@@ -30,7 +30,8 @@ import java.io.IOException;
 public class SecurityConfig {
 	private static final String[] PUBLIC_URLS = {
         "/v1",
-            "/v1/{userId}"
+			"/v1/{userId}",
+			"/internal/enrollment"
 	};
 
 	CustomJwtDecoder jwtDecoder;
@@ -38,7 +39,7 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(requests ->
 				requests
-						.requestMatchers(HttpMethod.GET, PUBLIC_URLS)
+						.requestMatchers(PUBLIC_URLS)
 						.permitAll()
 						.anyRequest()
 						.authenticated()

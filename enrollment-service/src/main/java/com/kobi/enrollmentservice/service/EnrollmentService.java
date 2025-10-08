@@ -2,6 +2,7 @@ package com.kobi.enrollmentservice.service;
 
 import com.kobi.enrollmentservice.dto.PageResponse;
 import com.kobi.enrollmentservice.dto.request.EnrollmentRequest;
+import com.kobi.enrollmentservice.dto.request.InternalEnrollmentRequest;
 import com.kobi.enrollmentservice.dto.response.CourseResponse;
 import com.kobi.enrollmentservice.dto.response.EnrollmentResponse;
 import com.kobi.enrollmentservice.dto.response.EnrollmentStatusResponse;
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +35,16 @@ public class EnrollmentService {
     EnrollmentRepository enrollmentRepository;
     EnrollmentMapper enrollmentMapper;
     CourseClient courseClient;
+
+    public void internalEnrollmentNoFree(InternalEnrollmentRequest enrollmentRequest) {
+            if (enrollmentRepository.existsByUserIdAndCourseId(enrollmentRequest.getUserId(), enrollmentRequest.getCourseId())) {
+                throw new AppException(ErrorCode.REGISTERED);
+            }
+            enrollmentRepository.save(Enrollment.builder()
+                    .userId(enrollmentRequest.getUserId())
+                    .courseId(enrollmentRequest.getCourseId())
+                    .build());
+        }
 
     public EnrollmentResponse enrollment(EnrollmentRequest enrollmentRequest) {
         var userId = getUserId();
