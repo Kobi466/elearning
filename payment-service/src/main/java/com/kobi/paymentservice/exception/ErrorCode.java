@@ -9,8 +9,8 @@ public enum ErrorCode {
 	AUTHENTICATION_FAILED(207, "Authentication failed", HttpStatus.UNAUTHORIZED),
 	COURSE_NO_FREE(208, "This course requires payment", HttpStatus.BAD_REQUEST),
 	REGISTERED(209,"You have already enrolled in this course", HttpStatus.BAD_REQUEST),
-	COURSE_NOT_FOUND(210, "Course not found", HttpStatus.NOT_FOUND)
-    ;
+	COURSE_NOT_FOUND(210, "Course not found", HttpStatus.NOT_FOUND),
+    KAFKA_ERROR(211, "Kafka error", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	private final int status;
 	private final String message;

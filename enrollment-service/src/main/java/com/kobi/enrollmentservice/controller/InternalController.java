@@ -22,7 +22,7 @@ public class InternalController {
 
     @PostMapping("/enrollment")
     public ApiResponse<Void> enrollment(@RequestBody @Valid InternalEnrollmentRequest enrollmentRequest) {
-        enrollmentService.internalEnrollmentNoFree(enrollmentRequest);
+//        enrollmentService.internalEnrollmentNoFree(enrollmentRequest);
         return ApiResponse.ok(null,( SuccessCode.ENROLLMENT_SUCCESS));
     }
 }

@@ -13,6 +13,7 @@ import com.kobi.enrollmentservice.exception.ErrorCode;
 import com.kobi.enrollmentservice.mapper.EnrollmentMapper;
 import com.kobi.enrollmentservice.repository.EnrollmentRepository;
 import com.kobi.enrollmentservice.repository.httpClient.CourseClient;
+import event.EnrollmentPayment;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,13 +37,13 @@ public class EnrollmentService {
     EnrollmentMapper enrollmentMapper;
     CourseClient courseClient;
 
-    public void internalEnrollmentNoFree(InternalEnrollmentRequest enrollmentRequest) {
-            if (enrollmentRepository.existsByUserIdAndCourseId(enrollmentRequest.getUserId(), enrollmentRequest.getCourseId())) {
+    public void internalEnrollmentNoFree(EnrollmentPayment event) {
+            if (enrollmentRepository.existsByUserIdAndCourseId(event.getUserId(), event.getCourseId())) {
                 throw new AppException(ErrorCode.REGISTERED);
             }
             enrollmentRepository.save(Enrollment.builder()
-                    .userId(enrollmentRequest.getUserId())
-                    .courseId(enrollmentRequest.getCourseId())
+                    .userId(event.getUserId())
+                    .courseId(event.getCourseId())
                     .build());
         }
 

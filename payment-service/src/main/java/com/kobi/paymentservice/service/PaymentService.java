@@ -13,10 +13,12 @@ import com.kobi.paymentservice.exception.ErrorCode;
 import com.kobi.paymentservice.repository.PaymentRepository;
 import com.kobi.paymentservice.repository.httpClient.CourseClient;
 import com.kobi.paymentservice.repository.httpClient.EnrollmentClient;
+import event.EnrollmentPayment;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,7 @@ public class PaymentService {
     CourseClient courseClient;
     EnrollmentClient enrollmentClient;
     VnPayConfig vnPayConfig;
+    KafkaTemplate<String, Object> kafkaTemplate;
 
     @Transactional
     public CreatePaymentResponse createPayment(CreatePaymentRequest createPaymentRequest, HttpServletRequest httpServletRequest) {
@@ -195,13 +198,22 @@ public class PaymentService {
             paymentRepository.save(order);
 
             // enrollment
-            enrollmentClient.enrollment(InternalEnrollmentRequest.builder().courseId(order.getCourseId()).userId(order.getUserId()).build()).block();
+//            enrollmentClient.enrollment(InternalEnrollmentRequest.builder().courseId(order.getCourseId()).userId(order.getUserId()).build()).block();
+            this.sentEventEnrollment(EnrollmentPayment.builder().courseId(order.getCourseId()).userId(order.getUserId()).build());
             return feSuccessUrl;
         } else {
             System.out.println("7. Thất bại từ VNPAY. ResponseCode: " + vnp_ResponseCode);
             order.setStatus(OrderStatus.FAILED);
             paymentRepository.save(order);
             return feFailUrl;
+        }
+    }
+    private void sentEventEnrollment(EnrollmentPayment event){
+        try{
+            kafkaTemplate.send("enrollment-user", event);
+        }catch (RuntimeException exception)
+        {
+            throw new AppException(ErrorCode.KAFKA_ERROR);
         }
     }
     private String getUserId(){
