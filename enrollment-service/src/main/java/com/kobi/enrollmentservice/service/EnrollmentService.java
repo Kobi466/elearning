@@ -2,7 +2,6 @@ package com.kobi.enrollmentservice.service;
 
 import com.kobi.enrollmentservice.dto.PageResponse;
 import com.kobi.enrollmentservice.dto.request.EnrollmentRequest;
-import com.kobi.enrollmentservice.dto.request.InternalEnrollmentRequest;
 import com.kobi.enrollmentservice.dto.response.CourseResponse;
 import com.kobi.enrollmentservice.dto.response.EnrollmentResponse;
 import com.kobi.enrollmentservice.dto.response.EnrollmentStatusResponse;
@@ -13,7 +12,6 @@ import com.kobi.enrollmentservice.exception.ErrorCode;
 import com.kobi.enrollmentservice.mapper.EnrollmentMapper;
 import com.kobi.enrollmentservice.repository.EnrollmentRepository;
 import com.kobi.enrollmentservice.repository.httpClient.CourseClient;
-import event.EnrollmentPayment;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -37,13 +35,10 @@ public class EnrollmentService {
     EnrollmentMapper enrollmentMapper;
     CourseClient courseClient;
 
-    public void internalEnrollmentNoFree(EnrollmentPayment event) {
-            if (enrollmentRepository.existsByUserIdAndCourseId(event.getUserId(), event.getCourseId())) {
-                throw new AppException(ErrorCode.REGISTERED);
-            }
+    public void internalEnrollmentNoFree(String userId, String courseId) {
             enrollmentRepository.save(Enrollment.builder()
-                    .userId(event.getUserId())
-                    .courseId(event.getCourseId())
+                    .userId(userId)
+                    .courseId(courseId)
                     .build());
         }
 

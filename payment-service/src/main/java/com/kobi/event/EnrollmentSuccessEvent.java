@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EnrollmentFailedEvent {
+public class EnrollmentSuccessEvent {
     String orderId;
     String courseId;
     String userId;

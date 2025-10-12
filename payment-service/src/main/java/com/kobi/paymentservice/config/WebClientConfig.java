@@ -1,7 +1,7 @@
 package com.kobi.paymentservice.config;
 
 import com.kobi.paymentservice.repository.httpClient.CourseClient;
-import com.kobi.paymentservice.repository.httpClient.EnrollmentClient;
+import com.kobi.paymentservice.repository.httpClient.VnPayClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.server.resource.web.reactive.function.client.ServletBearerExchangeFilterFunction;
@@ -25,16 +25,14 @@ public class WebClientConfig {
         return httpServiceProxyFactory.createClient(CourseClient.class);
     }
     @Bean
-    EnrollmentClient enrollmentClient(WebClient.Builder builder) {
-        ServletBearerExchangeFilterFunction bearer = new ServletBearerExchangeFilterFunction();
+    VnPayClient vnPayClient(WebClient.Builder builder) {
         WebClient webClient = builder
-                .baseUrl("http://localhost:8086/enrollment")
-                .filter(bearer)
+                .baseUrl("https://sandbox.vnpayment.vn")
                 .build();
         HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory
                 .builderFor(WebClientAdapter
                         .create(webClient))
                 .build();
-        return httpServiceProxyFactory.createClient(EnrollmentClient.class);
+        return httpServiceProxyFactory.createClient(VnPayClient.class);
     }
 }

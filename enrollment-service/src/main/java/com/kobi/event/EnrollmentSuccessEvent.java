@@ -8,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class EnrollmentFailedEvent {
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+public class EnrollmentSuccessEvent {
     String orderId;
     String courseId;
     String userId;

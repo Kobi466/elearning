@@ -2,7 +2,6 @@ package com.kobi.enrollmentservice.repository.httpClient;
 
 import com.kobi.enrollmentservice.dto.ApiResponse;
 import com.kobi.enrollmentservice.dto.response.CourseResponse;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

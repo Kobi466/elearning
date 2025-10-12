@@ -17,4 +17,5 @@ public class VnPayConfig {
     String hashSecret;
     String url;
     String returnUrl;
+    String apiUrl;
 }

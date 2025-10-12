@@ -26,7 +26,7 @@ public class Order {
     String courseId;
     @Column(nullable = false)
     BigDecimal amount;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     OrderStatus status;
     @Column(nullable = false, unique = true)

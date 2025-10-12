@@ -1,8 +1,6 @@
 package com.kobi.enrollmentservice.listener;
 
-import com.kobi.enrollmentservice.dto.request.InternalEnrollmentRequest;
-import com.kobi.enrollmentservice.service.EnrollmentService;
-import event.EnrollmentPayment;
+import com.kobi.enrollmentservice.service.ProcessEventService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,10 +11,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentEnrollment {
-    EnrollmentService enrollmentService;
-
-    @KafkaListener(topics = "enrollment-user", groupId = "enrollment-service-group")
-    public void listenerEvent(EnrollmentPayment event){
-        enrollmentService.internalEnrollmentNoFree(event);
+    ProcessEventService processEventService;
+    @KafkaListener(topics = "payment_events", groupId = "enrollment-service-group")
+    public void listenerEvent(String event){
+        processEventService.processEvent(event);
     }
 }

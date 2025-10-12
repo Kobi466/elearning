@@ -10,8 +10,8 @@ public enum ErrorCode {
 	COURSE_NO_FREE(208, "This course requires payment", HttpStatus.BAD_REQUEST),
 	REGISTERED(209,"You have already enrolled in this course", HttpStatus.BAD_REQUEST),
 	COURSE_NOT_FOUND(210, "Course not found", HttpStatus.NOT_FOUND),
-    KAFKA_ERROR(211, "Kafka error", HttpStatus.INTERNAL_SERVER_ERROR);
-
+    KAFKA_ERROR(211, "Kafka error", HttpStatus.INTERNAL_SERVER_ERROR),
+	ORDER_NOT_FOUND(212, "Order not found", HttpStatus.NOT_FOUND);
 	private final int status;
 	private final String message;
 	private final HttpStatus httpStatus;
