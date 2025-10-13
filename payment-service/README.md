@@ -1,45 +1,57 @@
-# Payment Service
+# Dịch vụ thanh toán (Payment Service)
 
-This service is responsible for handling payments in the Kobi E-learning platform.
+Dịch vụ thanh toán cho nền tảng Kobi E-learning.
 
-## VNPay Integration
+## Giới thiệu
 
-We are currently integrating VNPay into our payment service. This will allow users to pay for courses using the VNPay payment gateway.
+Đây là một microservice phụ trợ chịu trách nhiệm xử lý tất cả các logic liên quan đến thanh toán trong hệ thống. Nó được xây dựng bằng Spring Boot và được thiết kế để trở nên mạnh mẽ, có khả năng mở rộng và an toàn.
 
-### Luồng hoạt động (Workflow)
+## Công nghệ sử dụng
 
-1.  **Khởi tạo thanh toán (Initiate Payment):**
-    *   Người dùng chọn thanh toán bằng VNPay trên giao diện (UI).
-    *   UI gửi yêu cầu đến `payment-service` để tạo một đơn hàng thanh toán mới.
+*   **Java:** 21
+*   **Framework:** Spring Boot 3.5.6
+*   **Build Tool:** Maven
+*   **Database:** MySQL
+*   **Messaging:** Apache Kafka
+*   **Security:** OAuth2 Resource Server
 
-2.  **Tạo URL thanh toán (Create Payment URL):**
-    *   `payment-service` nhận yêu cầu, tạo một bản ghi giao dịch trong cơ sở dữ liệu với trạng thái "chờ thanh toán" (pending).
-    *   Service gọi đến API của VNPay, gửi thông tin đơn hàng (số tiền, mã đơn hàng, v.v.).
-    *   VNPay xử lý và trả về một URL thanh toán duy nhất cho giao dịch này.
-    *   `payment-service` trả URL này về cho UI.
+## Điều kiện tiên quyết
 
-3.  **Chuyển hướng đến cổng VNPay (Redirect to VNPay Gateway):**
-    *   UI nhận được URL và chuyển hướng người dùng đến trang thanh toán của VNPay.
+Trước khi bắt đầu, hãy đảm bảo bạn đã cài đặt các phần mềm sau:
 
-4.  **Xử lý thanh toán (Process Payment):**
-    *   Người dùng nhập thông tin thanh toán (thẻ, tài khoản ngân hàng) trên cổng VNPay và xác nhận.
+*   JDK 21
+*   Apache Maven
+*   MySQL
+*   Apache Kafka
 
-5.  **VNPay gọi IPN (Instant Payment Notification):**
-    *   Sau khi người dùng hoàn tất thanh toán, VNPay sẽ gửi một yêu cầu (callback) đến một endpoint đặc biệt trên `payment-service` (được gọi là IPN URL).
-    *   Yêu cầu này chứa kết quả của giao dịch (thành công hay thất bại) và chữ ký số để xác thực.
+## Cài đặt và Khởi chạy
 
-6.  **Xác thực và cập nhật giao dịch (Verify and Update Transaction):**
-    *   `payment-service` nhận được IPN, tiến hành xác thực chữ ký số của VNPay để đảm bảo dữ liệu không bị giả mạo.
-    *   Service gọi lại API của VNPay để một lần nữa truy vấn trạng thái của giao dịch (để tăng cường bảo mật).
-    *   Nếu giao dịch hợp lệ và thành công, `payment-service` sẽ cập nhật trạng thái đơn hàng trong cơ sở dữ liệu thành "đã thanh toán" (completed). Đồng thời, có thể kích hoạt các logic nghiệp vụ khác (ví dụ: cấp quyền truy cập khóa học cho người dùng).
+1.  **Clone a repository:**
+    ```bash
+    git clone <your-repository-url>
+    cd payment-service
+    ```
 
-7.  **Người dùng quay lại trang web (User Return):**
-    *   Sau khi thanh toán xong trên cổng VNPay, người dùng sẽ được chuyển hướng trở lại trang web của Kobi Elearning (Return URL).
-    *   UI hiển thị thông báo thanh toán thành công hoặc thất bại dựa trên kết quả trả về từ VNPay.
+2.  **Cấu hình ứng dụng:**
+    Mở file `src/main/resources/application.properties` (hoặc `application.yml`) và cập nhật các thuộc tính sau cho phù hợp với môi trường cục bộ của bạn:
+    *   Cấu hình kết nối cơ sở dữ liệu (URL, username, password)
+    *   Cấu hình máy chủ Kafka
+    *   Cấu hình máy chủ phát hành OAuth2
 
-### TODO
+3.  **Build dự án:**
+    ```bash
+    mvn clean install
+    ```
 
-- [ ] Implement the VNPay payment gateway
-- [ ] Add a new endpoint for creating VNPay payments
-- [ ] Add an IPN endpoint to handle VNPay callbacks
-- [ ] Update the UI to support VNPay payments
+4.  **Chạy ứng dụng:**
+    ```bash
+    mvn spring-boot:run
+    ```
+    Ứng dụng sẽ khởi động và chạy trên cổng mặc định (thường là 8080).
+
+## API Endpoints
+
+*(Phần này mô tả các API endpoint chính do dịch vụ cung cấp. Bạn nên thêm tài liệu chi tiết cho từng endpoint ở đây.)*
+
+---
+*Tài liệu này được tạo tự động.*
