@@ -40,7 +40,7 @@ public class ProcessEventService {
                 log.warn("Sự kiện {} đã được xử lý trước đó. Bỏ qua.", eventId);
                 return;
             }
-//            //Test event failed
+            //Test event failed
 //            if(true){
 //                throw new RuntimeException("Test Failed");
 //            }

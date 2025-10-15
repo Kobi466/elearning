@@ -12,11 +12,18 @@ import java.util.Map;
 public class VnPayUtils {
     public static String hmacSHA512(final String key, final String data) {
         try {
-            Mac sha512Hmac = Mac.getInstance("HmacSHA512");
-            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "HmacSHA512");
-            sha512Hmac.init(secretKey);
-            byte[] hmacData = sha512Hmac.doFinal(data.getBytes());
-            return bytesToHex(hmacData);
+            if (key == null || data == null) {
+                throw new NullPointerException();
+            }
+            final Mac hmac512 = Mac.getInstance("HmacSHA512");
+
+            final SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
+            hmac512.init(secretKey);
+
+            final byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+            final byte[] result = hmac512.doFinal(dataBytes);
+
+            return bytesToHex(result); // Dùng lại hàm bytesToHex của bạn
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi tạo chữ ký HmacSHA512", e);
         }
@@ -74,6 +81,29 @@ public class VnPayUtils {
             }
         }
         hashData.setLength(hashData.length() - 1); // remove last &
+        return hashData.toString();
+    }
+    public static String getPipeDelimitedHashData(Map<String, String> vnp_Params) {
+        // Thứ tự các trường này phải tuân thủ nghiêm ngặt theo tài liệu của VNPAY cho API JSON.
+        String[] fieldOrder = new String[]{
+                "vnp_RequestId", "vnp_Version", "vnp_Command", "vnp_TmnCode",
+                "vnp_TransactionType", "vnp_TxnRef", "vnp_Amount", "vnp_TransactionNo",
+                "vnp_TransactionDate", "vnp_CreateBy", "vnp_CreateDate", "vnp_IpAddr", "vnp_OrderInfo"
+        };
+
+        StringBuilder hashData = new StringBuilder();
+        for (String fieldName : fieldOrder) {
+            if (vnp_Params.containsKey(fieldName)) {
+                String fieldValue = vnp_Params.get(fieldName);
+                if (fieldValue != null && !fieldValue.isEmpty()) {
+                    hashData.append(fieldValue).append("|");
+                }
+            }
+        }
+        // Xóa dấu '|' cuối cùng
+        if (hashData.length() > 0) {
+            hashData.setLength(hashData.length() - 1);
+        }
         return hashData.toString();
     }
 }

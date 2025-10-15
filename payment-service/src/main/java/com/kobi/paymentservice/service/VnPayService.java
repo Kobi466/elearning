@@ -23,9 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -117,6 +119,7 @@ public class VnPayService {
         String vnp_ResponseCode = allRequestParams.get("vnp_ResponseCode");
         if ("00".equals(vnp_ResponseCode)) {
             order.setStatus(OrderStatus.PAID);
+            order.setPayDate(allRequestParams.get("vnp_PayDate"));
             order.setGatewayTransId(allRequestParams.get("vnp_TransactionNo"));
             paymentRepository.save(order);
             // enrollment
@@ -139,126 +142,124 @@ public class VnPayService {
     //Gọi Back-end: Trình duyệt truy cập vào Back-end của bạn (ví dụ: localhost:8085) và gửi kèm kết quả thanh toán.
     //
     //Cập nhật DB: Back-end xác thực và cập nhật Database.
-    @Transactional
-    public String handleVnPayReturn(Map<String, String> allRequestParams) {
-        log.info("1. Bắt đầu xử lý VNPAY return với các tham số:{}",  allRequestParams);
-        //thay vào địa chỉ cảu FE
-        String feSuccessUrl = "https://google.com?payment_status=success";
-        String feFailUrl = "https://google.com?payment_status=fail";
+//    @Transactional
+//    public String handleVnPayReturn(Map<String, String> allRequestParams) {
+//        log.info("1. Bắt đầu xử lý VNPAY return với các tham số:{}",  allRequestParams);
+//        //thay vào địa chỉ cảu FE
+//        String feSuccessUrl = "https://google.com?payment_status=success";
+//        String feFailUrl = "https://google.com?payment_status=fail";
+//
+//        String vnp_SecureHash = allRequestParams.get("vnp_SecureHash");
+//        if (vnp_SecureHash == null) {
+//            log.error("2. Lỗi: Không có vnp_SecureHash!");
+//            return feFailUrl;
+//        }
+//
+//        // Tạo một Map mới chỉ chứa các tham số sẽ được dùng để hash
+//        Map<String, String> fieldsToHash = new HashMap<>();
+//        for (Map.Entry<String, String> entry : allRequestParams.entrySet()) {
+//            String fieldName = entry.getKey();
+//            String fieldValue = entry.getValue();
+//            if (fieldName.startsWith("vnp_") && !fieldName.equals("vnp_SecureHash")) {
+//                fieldsToHash.put(fieldName, fieldValue);
+//            }
+//        }
+//
+//        String calculatedHash = VnPayUtils.hmacSHA512(vnPayConfig.getHashSecret(), VnPayUtils.getHashData(fieldsToHash));
+//
+//        if (!calculatedHash.equals(vnp_SecureHash)) {
+//            log.error("2. Lỗi: Chữ ký không hợp lệ!");
+//            log.error("   - Chữ ký VNPAY trả về: {}" , vnp_SecureHash);
+//            log.error("   - Chữ ký tính toán lại: {}", calculatedHash);
+//            return feFailUrl;
+//        }
+//
+//        String vnp_TxnRef = allRequestParams.get("vnp_TxnRef");
+//        Order order = paymentRepository.findByOrderRef(vnp_TxnRef).orElse(null);
+//
+//        if (order == null) {
+//            log.error("3. Lỗi: Không tìm thấy đơn hàng với orderRef: {}", vnp_TxnRef);
+//            return feFailUrl;
+//        }
+//
+//        if (!OrderStatus.PENDING.equals(order.getStatus())) {
+//            log.error("4. Lỗi: Đơn hàng không ở trạng thái PENDING. Trạng thái hiện tại:{}", order.getStatus());
+//            return feFailUrl;
+//        }
+//
+//        long requestAmount = Long.parseLong(allRequestParams.get("vnp_Amount"));
+//        long orderAmount = order.getAmount().multiply(new BigDecimal(100)).longValue();
+//        if (requestAmount != orderAmount) {
+//            log.error("5. Lỗi: Số tiền không khớp. VNPAY trả về:{}, Đơn hàng lưu:{}", requestAmount, orderAmount);
+//            return feFailUrl;
+//        }
+//
+//        String vnp_ResponseCode = allRequestParams.get("vnp_ResponseCode");
+//        if ("00".equals(vnp_ResponseCode)) {
+//            log.error("6. Thành công! Cập nhật trạng thái đơn hàng.");
+//            order.setStatus(OrderStatus.PAID);
+//            order.setPayDate(allRequestParams.get("vnp_PayDate"));
+//            order.setGatewayTransId(allRequestParams.get("vnp_TransactionNo"));
+//            paymentRepository.save(order);
+//            // 2. GỌI OUTBOX SERVICE ĐỂ TẠO SỰ KIỆN
+//            outboxEventService.createAndPublishOutboxEvent(order, "ORDER_PAID");
+//
+//            return feSuccessUrl;
+//        } else {
+//            log.error("7. Thất bại từ VNPAY. ResponseCode: {}", vnp_ResponseCode);
+//            order.setStatus(OrderStatus.FAILED);
+//            paymentRepository.save(order);
+//            return feFailUrl;
+//        }
+//    }
 
-        String vnp_SecureHash = allRequestParams.get("vnp_SecureHash");
-        if (vnp_SecureHash == null) {
-            log.error("2. Lỗi: Không có vnp_SecureHash!");
-            return feFailUrl;
-        }
-
-        // Tạo một Map mới chỉ chứa các tham số sẽ được dùng để hash
-        Map<String, String> fieldsToHash = new HashMap<>();
-        for (Map.Entry<String, String> entry : allRequestParams.entrySet()) {
-            String fieldName = entry.getKey();
-            String fieldValue = entry.getValue();
-            if (fieldName.startsWith("vnp_") && !fieldName.equals("vnp_SecureHash")) {
-                fieldsToHash.put(fieldName, fieldValue);
-            }
-        }
-
-        String calculatedHash = VnPayUtils.hmacSHA512(vnPayConfig.getHashSecret(), VnPayUtils.getHashData(fieldsToHash));
-
-        if (!calculatedHash.equals(vnp_SecureHash)) {
-            log.error("2. Lỗi: Chữ ký không hợp lệ!");
-            log.error("   - Chữ ký VNPAY trả về: {}" , vnp_SecureHash);
-            log.error("   - Chữ ký tính toán lại: {}", calculatedHash);
-            return feFailUrl;
-        }
-
-        String vnp_TxnRef = allRequestParams.get("vnp_TxnRef");
-        Order order = paymentRepository.findByOrderRef(vnp_TxnRef).orElse(null);
-
-        if (order == null) {
-            log.error("3. Lỗi: Không tìm thấy đơn hàng với orderRef: {}", vnp_TxnRef);
-            return feFailUrl;
-        }
-
-        if (!OrderStatus.PENDING.equals(order.getStatus())) {
-            log.error("4. Lỗi: Đơn hàng không ở trạng thái PENDING. Trạng thái hiện tại:{}", order.getStatus());
-            return feFailUrl;
-        }
-
-        long requestAmount = Long.parseLong(allRequestParams.get("vnp_Amount"));
-        long orderAmount = order.getAmount().multiply(new BigDecimal(100)).longValue();
-        if (requestAmount != orderAmount) {
-            log.error("5. Lỗi: Số tiền không khớp. VNPAY trả về:{}, Đơn hàng lưu:{}", requestAmount, orderAmount);
-            return feFailUrl;
-        }
-
-        String vnp_ResponseCode = allRequestParams.get("vnp_ResponseCode");
-        if ("00".equals(vnp_ResponseCode)) {
-            log.error("6. Thành công! Cập nhật trạng thái đơn hàng.");
-            order.setStatus(OrderStatus.PAID);
-            order.setGatewayTransId(allRequestParams.get("vnp_TransactionNo"));
-            paymentRepository.save(order);
-            // 2. GỌI OUTBOX SERVICE ĐỂ TẠO SỰ KIỆN
-            outboxEventService.createAndPublishOutboxEvent(order, "ORDER_PAID");
-
-            return feSuccessUrl;
-        } else {
-            log.error("7. Thất bại từ VNPAY. ResponseCode: {}", vnp_ResponseCode);
-            order.setStatus(OrderStatus.FAILED);
-            paymentRepository.save(order);
-            return feFailUrl;
-        }
-    }
-
-    @PreAuthorize( "hasRole('ADMIN')")
-    public void refundOrder(String orderId){
+    @PreAuthorize("hasRole('ADMIN')")
+    public void refundOrder(String orderId) {
         log.info("Bắt đầu quy trình hoàn tiền cho orderId: {}", orderId);
         Order order = paymentRepository.findById(orderId)
-                .orElseThrow(()-> new AppException(ErrorCode.COURSE_NOT_FOUND));
-        if(!order.getStatus().equals(OrderStatus.FAILED)){
-//            throw new AppException(ErrorCode.ORDER_NOT_FAILED);
-            throw new RuntimeException("Chi hoan tien cho don hang that bai");
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        if (!order.getStatus().equals(OrderStatus.FAILED)) {
+            throw new IllegalStateException("Chỉ có thể hoàn tiền cho đơn hàng ghi danh thất bại. Trạng thái hiện tại: " + order.getStatus());
         }
-        Map<String, String> vnp_Params = new TreeMap<>(); // Dùng TreeMap để các key được sắp xếp
+
+        Map<String, String> vnp_Params = new TreeMap<>();
         vnp_Params.put("vnp_RequestId", UUID.randomUUID().toString());
         vnp_Params.put("vnp_Version", "2.1.0");
         vnp_Params.put("vnp_Command", "refund");
         vnp_Params.put("vnp_TmnCode", vnPayConfig.getTmnCode());
-        vnp_Params.put("vnp_TransactionType", "02"); // 02: Hoàn tiền toàn phần
+        vnp_Params.put("vnp_TransactionType", "02");
         vnp_Params.put("vnp_TxnRef", order.getOrderRef());
         vnp_Params.put("vnp_Amount", String.valueOf(order.getAmount().multiply(new BigDecimal(100)).longValue()));
         vnp_Params.put("vnp_OrderInfo", "Hoan tien cho don hang " + order.getOrderRef());
-        vnp_Params.put("vnp_TransactionNo", order.getGatewayTransId()); // Lấy từ giao dịch gốc
-
-        // SỬA LỖI: Sử dụng DateTimeFormatter cho các đối tượng LocalDateTime
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        vnp_Params.put("vnp_TransactionDate", order.getCreatedAt().format(formatter)); // Thời gian giao dịch gốc
-
+        vnp_Params.put("vnp_TransactionNo", order.getGatewayTransId());
+        vnp_Params.put("vnp_TransactionDate", order.getPayDate());
         vnp_Params.put("vnp_CreateBy", "admin_system");
-        String vnp_CreateDate = LocalDateTime.now().format(formatter); // Lấy thời gian hiện tại và định dạng
-        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
-        vnp_Params.put("vnp_IpAddr", "127.0.0.1"); // IP server của bạn
+        String createDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        vnp_Params.put("vnp_CreateDate", createDate);
+        vnp_Params.put("vnp_IpAddr", "127.0.0.1");//local
+        log.info("FINAL PAYLOAD TO SEND: {}", vnp_Params);
+        //process
+        String hashData = VnPayUtils.getPipeDelimitedHashData(vnp_Params);
+        log.info("Chuỗi hashData đã sửa: {}", hashData);
+        String calculatedHash = VnPayUtils.hmacSHA512(vnPayConfig.getHashSecret(), hashData);
+        log.info("Chuỗi hashData đã sửa: {}", calculatedHash);
+        vnp_Params.put("vnp_SecureHash", calculatedHash);
 
-        // 2. Tạo chữ ký
-        String hashData = VnPayUtils.getHashData(vnp_Params);
-        String vnp_SecureHash = VnPayUtils.hmacSHA512(vnPayConfig.getHashSecret(), hashData);
-        vnp_Params.put("vnp_SecureHash", vnp_SecureHash);
-
-        //call VnPay
+        // call VnPay
         var response = vnPayClient.callRefund(vnp_Params).block();
-        if (response == null) {
-            throw new RuntimeException("Không nhận được phản hồi từ VNPAY.");
-        }
-        String responseCode = response.getRspCode();
-        if ("00".equals(responseCode)) {
+        if (response != null && "00".equals(response.getRspCode())) {
             order.setStatus(OrderStatus.REFUND);
             paymentRepository.save(order);
-            log.info("Refund success");
+            log.info("Hoàn tiền thành công cho orderId: {}", orderId);
         } else {
-            log.error("VnPay no Refund");
+            String message = response != null ? response.getMessage() : "Response is null";
+            String rspCode = response != null ? response.getRspCode() : "N/A";
+            log.error("Hoàn tiền thất bại từ VNPAY. Mã lỗi: {}, Thông điệp: {}", rspCode, message);
+            throw new RuntimeException("Hoàn tiền thất bại: " + message);
         }
-
     }
     private String getUserId(){
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
+
 }

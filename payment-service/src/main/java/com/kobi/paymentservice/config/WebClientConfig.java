@@ -27,7 +27,6 @@ public class WebClientConfig {
     @Bean
     VnPayClient vnPayClient(WebClient.Builder builder) {
         WebClient webClient = builder
-                .baseUrl("https://sandbox.vnpayment.vn")
                 .build();
         HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory
                 .builderFor(WebClientAdapter

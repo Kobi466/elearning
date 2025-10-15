@@ -32,6 +32,7 @@ public class Order {
     @Column(nullable = false, unique = true)
     String orderRef;//vnp_TxnRef
     String gatewayTransId;//vnp_TransactionNo
+    String payDate; //vnp_PayDate
     @Column(nullable = false)
     String paymentGateway;
     LocalDateTime createdAt;

@@ -1,5 +1,6 @@
 package com.kobi.paymentservice.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,6 +9,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VnPayIPNResponse {
-    String RspCode;
-    String Message;
+    @JsonProperty("vnp_ResponseCode")
+    String rspCode;
+    @JsonProperty("vnp_Message")
+    String message;
 }

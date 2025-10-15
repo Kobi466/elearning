@@ -28,16 +28,17 @@ public class PaymentController {
         return ApiResponse.ok(vnPayService.createPayment(createPaymentRequest, httpServletRequest), SuccessCode.CREATE_PAYMENT_SUCCESS);
     }
 
-    @GetMapping("/vpn-ipn")
+    @GetMapping("/vnp-ipn")
     ApiResponse<VnPayIPNResponse> handleVnPayIPN(@RequestParam Map<String, String> allRequestParams) {
         return ApiResponse.ok(vnPayService.handleVnPayIPN(allRequestParams), SuccessCode.VN_PAY_IPN_SUCCESS);
     }
 
-    @GetMapping("/vnpay-return")
-    public void handleVnpayReturn(HttpServletResponse httpServletResponse, @RequestParam Map<String, String> allRequestParams) throws IOException {
-        String redirectUrl = vnPayService.handleVnPayReturn(allRequestParams);
-        httpServletResponse.sendRedirect(redirectUrl);
-    }
+//    @GetMapping("/vnpay-return")
+//    public void handleVnpayReturn(HttpServletResponse httpServletResponse, @RequestParam Map<String, String> allRequestParams) throws IOException {
+//        System.out.println("Server VNPay call Backend");
+//        String redirectUrl = vnPayService.handleVnPayReturn(allRequestParams);
+//        httpServletResponse.sendRedirect(redirectUrl);
+//    }
 
     @PostMapping("/{orderId}/refund")
     ApiResponse<Void> refundOrder(@PathVariable String orderId){

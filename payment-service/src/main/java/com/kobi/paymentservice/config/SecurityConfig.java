@@ -30,7 +30,8 @@ import java.io.IOException;
 @EnableMethodSecurity
 public class SecurityConfig {
 	private static final String[] PUBLIC_URLS = {
-			"/vnpay-return"
+			"/vnpay-return",
+			"/vnp-ipn",
 	};
 
 	CustomJwtDecoder jwtDecoder;

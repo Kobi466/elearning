@@ -45,7 +45,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/identity/api/v1/auth/.*",
             "/identity/api/v1/users/register",
             "/review/v1/get-reviewsForCourse.*",
-            "/payment/vnpay-return"
+            "/payment/vnpay-return",
+            "/payment/vnp-ipn"
     };
 
     @Override
