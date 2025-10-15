@@ -33,6 +33,11 @@ public class PaymentController {
         return ApiResponse.ok(vnPayService.handleVnPayIPN(allRequestParams), SuccessCode.VN_PAY_IPN_SUCCESS);
     }
 
+    @GetMapping("/{orderId}/status")
+    ApiResponse<String> checkTransactionStatus(@PathVariable String orderId){
+        return ApiResponse.ok(vnPayService.checkVnPayTransactionStatus(orderId), SuccessCode.CHECK_TRANSACTION_STATUS_SUCCESS);
+    }
+
 //    @GetMapping("/vnpay-return")
 //    public void handleVnpayReturn(HttpServletResponse httpServletResponse, @RequestParam Map<String, String> allRequestParams) throws IOException {
 //        System.out.println("Server VNPay call Backend");

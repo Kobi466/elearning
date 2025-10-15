@@ -262,4 +262,56 @@ public class VnPayService {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public String checkVnPayTransactionStatus(String orderId) {
+        log.info("Bắt đầu kiểm tra trạng thái giao dịch VNPAY cho orderId: {}", orderId);
+        Order order = paymentRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        // 1. Chuẩn bị các tham số cho API querydr
+        Map<String, String> vnp_Params = new TreeMap<>();
+        vnp_Params.put("vnp_RequestId", UUID.randomUUID().toString());
+        vnp_Params.put("vnp_Version", "2.1.0");
+        vnp_Params.put("vnp_Command", "querydr"); // <-- Lệnh truy vấn
+        vnp_Params.put("vnp_TmnCode", vnPayConfig.getTmnCode());
+        vnp_Params.put("vnp_TxnRef", order.getOrderRef());
+        vnp_Params.put("vnp_OrderInfo", "Kiem tra ket qua giao dich " + order.getOrderRef());
+        vnp_Params.put("vnp_TransactionDate", order.getPayDate()); // Thời gian của giao dịch gốc
+
+        String createDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        vnp_Params.put("vnp_CreateDate", createDate);
+        vnp_Params.put("vnp_IpAddr", "127.0.0.1");
+
+        // 2. Tạo chữ ký theo đúng chuẩn của querydr
+        String hashData = VnPayUtils.getPipeDelimitedHashDataForQuery(vnp_Params);
+        String calculatedHash = VnPayUtils.hmacSHA512(vnPayConfig.getHashSecret(), hashData);
+        vnp_Params.put("vnp_SecureHash", calculatedHash);
+
+        // 3. Gọi API VNPAY
+        var response = vnPayClient.callQueryDr(vnp_Params).block();
+
+        if (response == null || !"00".equals(response.getResponseCode())) {
+            throw new RuntimeException("VNPAY từ chối yêu cầu truy vấn. Lý do: " + (response != null ? response.getMessage() : "Response is null"));
+        }
+
+        // 4. Xử lý kết quả và cập nhật DB (nếu cần)
+        String vnpayStatus = response.getTransactionStatus();
+        String localStatus = order.getStatus().name();
+
+        // Chỉ cập nhật nếu trạng thái local là PENDING và VNPAY báo thành công
+        if ("PENDING".equals(localStatus) && "00".equals(vnpayStatus)) {
+            order.setStatus(OrderStatus.PAID);
+            order.setGatewayTransId(response.getTransactionNo()); // Cập nhật lại mã giao dịch VNPAY
+            paymentRepository.save(order);
+
+            // 2. GỌI OUTBOX SERVICE ĐỂ TẠO SỰ KIỆN
+            outboxEventService.createAndPublishOutboxEvent(order, "ORDER_PAID");
+
+
+            log.info("Đã cập nhật trạng thái đơn hàng {} từ PENDING sang PAID.", orderId);
+        }
+
+        return "Mã trạng thái: " + vnpayStatus + " (00: Thành công, 01: Chưa hoàn tất, 02: Lỗi)";
+    }
 }

@@ -106,4 +106,27 @@ public class VnPayUtils {
         }
         return hashData.toString();
     }
+
+    public static String getPipeDelimitedHashDataForQuery(Map<String, String> vnp_Params) {
+        // Thứ tự các trường này phải tuân thủ nghiêm ngặt theo tài liệu của VNPAY.
+        String[] fieldOrder = new String[]{
+                "vnp_RequestId", "vnp_Version", "vnp_Command", "vnp_TmnCode",
+                "vnp_TxnRef", "vnp_TransactionDate", "vnp_CreateDate", "vnp_IpAddr", "vnp_OrderInfo"
+        };
+
+        StringBuilder hashData = new StringBuilder();
+        for (String fieldName : fieldOrder) {
+            if (vnp_Params.containsKey(fieldName)) {
+                String fieldValue = vnp_Params.get(fieldName);
+                if (fieldValue != null && !fieldValue.isEmpty()) {
+                    hashData.append(fieldValue).append("|");
+                }
+            }
+        }
+        // Xóa dấu '|' cuối cùng
+        if (hashData.length() > 0) {
+            hashData.setLength(hashData.length() - 1);
+        }
+        return hashData.toString();
+    }
 }
