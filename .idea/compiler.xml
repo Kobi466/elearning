@@ -48,13 +48,14 @@
         <module name="enrollment-service" />
         <module name="review-service" />
       </profile>
-      <profile name="Annotation profile for payment-service" enabled="true">
+      <profile name="Annotation profile for AI-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.40/lombok-1.18.40.jar" />
         </processorPath>
+        <module name="AI-service" />
         <module name="payment-service" />
         <module name="progress-service" />
       </profile>
@@ -68,6 +69,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="AI-service" options="-parameters" />
       <module name="api-gateway" options="-parameters" />
       <module name="common-library" options="" />
       <module name="course-service" options="-parameters --add-opens java.base/java.lang=ALL-UNNAMED" />
