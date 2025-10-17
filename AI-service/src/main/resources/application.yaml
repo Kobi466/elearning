@@ -1,0 +1,19 @@
+server:
+  port: 8090
+  servlet:
+    context-path: /ai
+spring:
+  application:
+    name: AI-service
+  profiles:
+    active: dev
+  ai:
+    openai:
+      api-key: ${gemini-api-key}
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completions-path: /v1beta/openai/chat/completions
+        options:
+          model: gemini-2.0-flash
+
+
