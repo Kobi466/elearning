@@ -60,12 +60,6 @@
         <module name="progress-service" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="e-elearning" target="21" />
-      <module name="e-elearning (1)" target="21" />
-      <module name="elearning" target="21" />
-      <module name="notification" target="21" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -73,14 +67,9 @@
       <module name="api-gateway" options="-parameters" />
       <module name="common-library" options="" />
       <module name="course-service" options="-parameters --add-opens java.base/java.lang=ALL-UNNAMED" />
-      <module name="e-elearning" options="-parameters" />
-      <module name="e-elearning (1)" options="-parameters" />
       <module name="e-learning" options="-parameters" />
-      <module name="elearning" options="-parameters" />
       <module name="enrollment-service" options="-parameters" />
       <module name="file-service" options="-parameters" />
-      <module name="identity-service" options="-parameters" />
-      <module name="notification" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="payment-service" options="-parameters" />
       <module name="profile-service" options="-parameters" />
