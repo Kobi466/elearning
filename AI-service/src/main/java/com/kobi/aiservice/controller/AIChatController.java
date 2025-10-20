@@ -26,12 +26,17 @@ public class AIChatController {
     List<Exercise> chatExercise(@RequestBody ChatRequest chatRequest) {
         return  aiChatService.chatExercise(chatRequest);
     }
-    @PostMapping("/chat-stream")
-    Flux<String> chatStream(@RequestBody ChatRequest chatRequest) {
-        return  aiChatService.chat(chatRequest);
+    @PostMapping("/chat-ollama")
+    Flux<String> chatOllamaModel(@RequestBody ChatRequest chatRequest) {
+        return  aiChatService.chatOllamaModel(chatRequest);
     }
-    @PostMapping("/chat-quiz")
-    Quiz chatQuiz(@RequestBody ChatRequest chatRequest) {
-        return  aiChatService.generateQuiz(chatRequest);
+
+        @PostMapping("/chat-openAi")
+    Flux<String> chatOpenAiModel(@RequestBody ChatRequest chatRequest) {
+        return  aiChatService.chatOpenAiModel(chatRequest);
     }
+//    @PostMapping("/chat-quiz")
+//    Quiz chatQuiz(@RequestBody ChatRequest chatRequest) {
+//        return  aiChatService.generateQuiz(chatRequest);
+//    }
 }
