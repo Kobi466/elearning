@@ -1,0 +1,18 @@
+server:
+  port: 8085
+  servlet:
+    context-path: /course
+spring:
+  profiles:
+    active: dev
+  application:
+    name: course-service
+  datasource:
+    url: ${URL}
+    username: ${USER_NAME}
+    password: ${PASS_WORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update

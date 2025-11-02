@@ -1,19 +1,20 @@
 package com.kobi.elearning.repository;
 
 
-import com.kobi.elearning.entity.User;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.kobi.elearning.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
 	boolean existsByUserName(String userName);
 
-    boolean existsByEmail(String email);
+	boolean existsByEmail(String email);
 
-    Optional<User> findByUserName(String userName);
+	Optional<User> findByUserName(String userName);
 
 	Optional<User> findById(String id);
 }

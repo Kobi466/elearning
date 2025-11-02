@@ -1,0 +1,19 @@
+server:
+  port: 8087
+  servlet:
+    context-path: /progress
+spring:
+  profiles:
+    active: dev
+  application:
+    name: progress-service
+  datasource:
+    url: ${URL}
+    username: ${USER_NAME}
+    password: ${PASS_WORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update

@@ -1,0 +1,25 @@
+server:
+  servlet:
+    context-path: /file
+  port: 8084
+spring:
+  profiles:
+    active: dev
+  application:
+    name: file-service
+  datasource:
+    url: ${url}
+    username: ${USER_NAME}
+    password: ${PASS_WORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+aws:
+  region: ap-southeast-2
+  s3:
+    bucket-name: ${BUCKET_NAME}
+  credentials:
+    access-key: ${ACCESS_KEY}
+    secret-key: ${SECRET_KEY}

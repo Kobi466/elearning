@@ -1,0 +1,28 @@
+server:
+  port: 8090
+  servlet:
+    context-path: /ai
+spring:
+  application:
+    name: AI-service
+  profiles:
+    active: dev
+  ai:
+    chat:
+      client:
+        enabled: false
+    openai:
+      api-key: ${gemini-api-key}
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completions-path: /v1beta/openai/chat/completions
+        options:
+          model: gemini-2.5-flash
+          temperature: 0.1
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: llama3:latest
+          temperature: 0.7
+

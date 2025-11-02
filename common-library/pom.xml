@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Đây là một thư viện Java đơn giản, không cần kế thừa từ Spring Boot Parent -->
+
+    <groupId>com.kobi</groupId>
+    <artifactId>common-library</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>common-library</name>
+    <description>A simple library containing shared Avro-generated event classes.</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <avro.version>1.11.3</avro.version>
+    </properties>
+
+    <dependencies>
+        <!-- Dependency BẮT BUỘC để sinh code và biên dịch -->
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>${avro.version}</version>
+        </dependency>
+
+        <!-- Lombok là tùy chọn nhưng hữu ích -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope> <!-- 'provided' là đúng cho thư viện -->
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Avro plugin -->
+            <plugin>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro-maven-plugin</artifactId>
+                <version>${avro.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>schema</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sourceDirectory>${project.basedir}/src/main/avro</sourceDirectory>
+                    <outputDirectory>${project.basedir}/target/generated-sources/avro</outputDirectory>
+                    <fieldVisibility>PUBLIC_DEPRECATED</fieldVisibility>
+                    <stringType>String</stringType>
+                    <createSetters>true</createSetters>
+                    <enableDecimalLogicalType>true</enableDecimalLogicalType>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.avro</groupId>
+                        <artifactId>avro-compiler</artifactId>
+                        <version>${avro.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+</project>

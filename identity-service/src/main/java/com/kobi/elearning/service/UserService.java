@@ -21,4 +21,6 @@ public interface UserService {
 	List<UserResponse> getUsers();
 
 	void createPassword(PasswordCreationRequest request);
+
+    void compensateUserCreation(String userId);
 }

@@ -1,0 +1,18 @@
+server:
+  port: 8088
+  servlet:
+    context-path: /review
+spring:
+  application:
+    name: review-service
+  profiles:
+    active: dev
+  datasource:
+    url: ${URL}
+    username: ${USER_NAME}
+    password: ${PASS_WORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update

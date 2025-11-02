@@ -1,0 +1,107 @@
+version: "3.9"
+name : "bilearning"
+services:
+  # KHÔNG CÓ ZOOKEEPER Ở ĐÂY
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1 # Dùng phiên bản mới
+    container_name: kafKa
+    ports:
+      - "9092:9092"
+    environment:
+      # Thêm dòng này để cung cấp CLUSTER_ID
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+      # --- Cấu hình KRaft ---
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller' # Chạy ở chế độ kết hợp broker và controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093' # Báo cho node biết ai là người bỏ phiếu
+
+      # --- Cấu hình Listener ---
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,CONTROLLER://kafka:9093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+
+      # --- Các cấu hình khác ---
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.6.1
+    container_name: schema-registry
+    ports:
+      - "8081:8081"
+    depends_on:
+      - kafka
+    environment:
+      # Schema Registry giờ kết nối trực tiếp đến Kafka, không cần Zookeeper
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
+
+  redis:
+    image: redis:7
+    container_name: rediS
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - devnet
+
+  mysql:
+    image: mysql:8.3
+    container_name: mysqL
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - devnet
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - devnet
+
+  neo4j:
+    image: neo4j:5
+    container_name: neo4J
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/12345678
+      - NEO4J_server_config_strict__validation_enabled=false
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - devnet
+
+networks:
+  devnet:
+
+volumes:
+  kafka_data:
+  redis_data:
+  mysql_data:
+  mongo_data:
+  neo4j_data:
+  neo4j_logs:

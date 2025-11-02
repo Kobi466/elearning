@@ -1,0 +1,36 @@
+server:
+  port: 8089
+  servlet:
+    context-path: /payment
+spring:
+  profiles:
+    active: dev
+  application:
+    name: payment-service
+  datasource:
+    url: ${URL}
+    username: ${USER_NAME}
+    password: ${PASS_WORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      auto-offset-reset: earliest
+      group-id: payment-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+vnpay:
+  tmnCode: ${VNPAY_TMNCODE}
+  hashSecret: ${VNPAY_HASHSECRET}
+  url: ${VNPAY_URL}
+  returnUrl: ${VNPAY_RETURNURL}
+  apiUrl: ${VNPAY_APIURL}

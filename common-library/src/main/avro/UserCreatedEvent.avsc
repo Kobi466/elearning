@@ -1,0 +1,140 @@
+{
+  "type": "record",
+  "namespace": "com.kobi.avro",
+  "name": "UserCreatedEvent",
+  "doc": "Event published when a new user is successfully registered.",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique identifier for this event."
+    },
+    {
+      "name": "eventType",
+      "type": "string",
+      "default": "USER_CREATED",
+      "doc": "Type of event."
+    },
+    {
+      "name": "eventVersion",
+      "type": "int",
+      "default": 1,
+      "doc": "Schema version for evolution support."
+    },
+    {
+      "name": "occurredAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "When the event occurred."
+    },
+    {
+      "name": "correlationId",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Trace ID to correlate logs across services."
+    },
+    {
+      "name": "causationId",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Event ID that caused this event."
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "doc": "Service or bounded context emitting this event."
+    },
+    {
+      "name": "aggregateId",
+      "type": "string",
+      "doc": "Aggregate root ID, used for partitioning (e.g., userId)."
+    },
+    {
+      "name": "user",
+      "type": {
+        "type": "record",
+        "name": "UserPayload",
+        "fields": [
+          {
+            "name": "userId",
+            "type": "string",
+            "doc": "Unique identifier for the user."
+          },
+          {
+            "name": "userName",
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": null,
+            "doc": "The user's username."
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "doc": "The user's primary email address."
+          },
+          {
+            "name": "fullName",
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": null,
+            "doc": "Full display name."
+          },
+          {
+            "name": "firstName",
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": null
+          },
+          {
+            "name": "lastName",
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": null
+          },
+          {
+            "name": "avatar",
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": null,
+            "doc": "Avatar image URL."
+          },
+          {
+            "name": "locale",
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": null,
+            "doc": "Preferred locale (e.g. en-US)."
+          },
+          {
+            "name": "createdAt",
+            "type": {
+              "type": "long",
+              "logicalType": "timestamp-millis"
+            },
+            "doc": "When the user was created."
+          }
+        ]
+      }
+    }
+  ]
+}

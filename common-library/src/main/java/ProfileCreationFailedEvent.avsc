@@ -1,0 +1,18 @@
+//{
+//  "namespace": "com.kobi.avro",
+//  "type": "record",
+//  "name": "ProfileCreationFailedEvent",
+//  "doc": "Event published when the profile creation fails for a user.",
+//  "fields": [
+//    {
+//      "name": "userId",
+//      "type": "string",
+//      "doc": "Unique identifier for this event."
+//    },
+//    {
+//      "name": "reason",
+//      "type": "string",
+//      "doc": "Reason for the failure."
+//    }
+//  ]
+//}

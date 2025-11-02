@@ -1,9 +1,11 @@
 server:
   port: 8080
   servlet:
-        context-path: /web
+        context-path: /identity
 
 spring:
+    profiles:
+      active: dev
     datasource:
       url: ${DBMS_CONNECTION}
       driverClassName: com.mysql.cj.jdbc.Driver
@@ -17,9 +19,40 @@ spring:
         redis:
             host: ${REDIS_HOST}
             port: ${REDIS_PORT}
+
+    kafka:
+      bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
+      producer:
+        bootstrap-servers: localhost:9092
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        # QUAN TRỌNG: Polling Publisher chỉ gửi đi byte[] đã được serialize sẵn
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      properties:
+          # URL này dùng cho bean KafkaAvroSerializer trong code
+        schema.registry.url: http://localhost:8081
+      consumer:
+        auto-offset-reset: earliest
+        group-id: identity-service-compensation-group
+        bootstrap-servers: localhost:9092
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+        properties:
+          spring.json.trusted.packages: "*" # Tin t??ng t?t c? c�c package ?? deserialize JSON
+      listener:
+        type: batch
+        ack-mode: manual_immediate
+        missing-topics-fatal: false
+        dlt:
+          enabled: true
+          suffix: .dlt # Tự động tạo topic DLT với hậu tố .dlt
+          producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            # Khi gửi message lỗi vào DLT, chúng ta muốn gửi nguyên bản payload (dạng byte[])
+            # mà không cần chuyển đổi, do đó dùng ByteArraySerializer.
+            value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 jwt:
   secret: ${JWT_SECRET}
-  access-token-expiration: 300000  # 15 minute in milliseconds
+  access-token-expiration: 259200000  # 15 minute in milliseconds
   refresh-token-expiration: 604800000  # 7 days in milliseconds
 google:
   client-id: ${GOOGLE_CLIENT_ID}

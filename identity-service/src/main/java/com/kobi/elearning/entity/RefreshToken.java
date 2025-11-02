@@ -1,11 +1,10 @@
 package com.kobi.elearning.entity;
 
 
+import java.util.Date;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
 
 
 @Entity

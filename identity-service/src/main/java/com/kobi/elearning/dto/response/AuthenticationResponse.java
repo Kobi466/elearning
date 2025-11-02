@@ -1,9 +1,9 @@
 package com.kobi.elearning.dto.response;
 
+import java.util.Date;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -13,6 +13,6 @@ import java.util.Date;
 public class AuthenticationResponse {
 	String accessToken;
 	String refreshToken;
-    Date accessTokenExpiresAt;
+	Date accessTokenExpiresAt;
 	UserResponse user;
 }

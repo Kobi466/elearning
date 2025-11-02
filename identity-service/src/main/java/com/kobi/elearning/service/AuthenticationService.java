@@ -1,6 +1,8 @@
 package com.kobi.elearning.service;
 
 
+import org.springframework.stereotype.Service;
+
 import com.kobi.elearning.dto.request.IntrospectRequest;
 import com.kobi.elearning.dto.request.LoginRequest;
 import com.kobi.elearning.dto.request.LogoutRequest;
@@ -8,7 +10,6 @@ import com.kobi.elearning.dto.request.RefreshTokenRequest;
 import com.kobi.elearning.dto.response.AuthenticationResponse;
 import com.kobi.elearning.dto.response.IntrospectResponse;
 import com.kobi.elearning.dto.response.RefreshTokenResponse;
-import org.springframework.stereotype.Service;
 
 @Service
 public interface AuthenticationService {

@@ -1,8 +1,22 @@
 package com.kobi.elearning.service.implement;
 
 
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import com.kobi.avro.UserCreatedEvent;
+import com.kobi.avro.UserPayload;
 import com.kobi.elearning.constant.AuthProvider;
 import com.kobi.elearning.constant.PredefinedRole;
+import com.kobi.elearning.constant.Status;
 import com.kobi.elearning.dto.request.PasswordCreationRequest;
 import com.kobi.elearning.dto.request.UserCreateRequest;
 import com.kobi.elearning.dto.request.UserUpdateRequest;
@@ -14,103 +28,149 @@ import com.kobi.elearning.exception.ErrorCode;
 import com.kobi.elearning.mapper.UserMapper;
 import com.kobi.elearning.repository.RoleRepository;
 import com.kobi.elearning.repository.UserRepository;
+import com.kobi.elearning.service.OutboxEventService;
 import com.kobi.elearning.service.UserService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
-import java.util.HashSet;
-import java.util.List;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService {
-    UserRepository userRepository;
-    UserMapper userMapper;
-    RoleRepository roleRepository;
-    PasswordEncoder passwordEncoder;
+	UserRepository userRepository;
+	UserMapper userMapper;
+	RoleRepository roleRepository;
+	PasswordEncoder passwordEncoder;
+	OutboxEventService outboxEventService;
 
-
-    @Override
-    public void createPassword(PasswordCreationRequest request) {
-        var context = SecurityContextHolder.getContext();
+	@Override
+	public void createPassword(PasswordCreationRequest request) {
+		var context = SecurityContextHolder.getContext();
 //		var id = ((org.springframework.security.oauth2.jwt.Jwt) context.getAuthentication().getPrincipal()).getSubject();
-        var id = context.getAuthentication().getName();
-        User user1 = userRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        if (StringUtils.hasText(user1.getPasswordHash())
-                || user1.getProvider() == AuthProvider.LOCAL) {
-            throw new AppException(ErrorCode.PASSWORD_EXISTED);
-        }
-        user1.setPasswordHash(passwordEncoder.encode(request.getPassWord()));
-        userRepository.save(user1);
-    }
+		var id = context.getAuthentication().getName();
+		User user1 = userRepository.findById(id)
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+		if (StringUtils.hasText(user1.getPasswordHash())
+				|| user1.getProvider() == AuthProvider.LOCAL) {
+			throw new AppException(ErrorCode.PASSWORD_EXISTED);
+		}
+		user1.setPasswordHash(passwordEncoder.encode(request.getPassWord()));
+		userRepository.save(user1);
+	}
 
-    @Override
-    public UserResponse createUser(UserCreateRequest request) {
-        if (userRepository.existsByUserName(request.getUserName())) {
-            throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
-        }
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
-        }
-        request.setPassWord(passwordEncoder.encode(request.getPassWord()));
+	@Override
+	@Transactional
+	public void compensateUserCreation(String userId) {
+		userRepository.findById(userId).ifPresent(
+				user -> {
+					if (user.getStatus()== Status.ACTIVE){
+						user.setStatus(Status.INACTIVE);
+						userRepository.save(user);
+						log.info("Compensating user creation for user {}", userId);
+					} else {
+						log.info("User {} is already inactive", userId);
+					}
+				}
+		);
+	}
 
-        var user = userMapper.toUser(request);
-        HashSet<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(PredefinedRole.STUDENT));
-        user.setRoles(roles);
+	@Transactional
+	@Override
+	public UserResponse createUser(UserCreateRequest request) {
+		if (userRepository.existsByUserName(request.getUserName())) {
+			throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
+		}
+		if (userRepository.existsByEmail(request.getEmail())) {
+			throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+		}
+		request.setPassWord(passwordEncoder.encode(request.getPassWord()));
 
-        return userMapper.toUserResponse(userRepository.save(user));
-    }
+		var user = userMapper.toUser(request);
+		HashSet<Role> roles = new HashSet<>();
+		roles.add(roleRepository.findByName(PredefinedRole.STUDENT));
+		user.setRoles(roles);
 
-    @Override
-    public UserResponse updateUser(String id, UserUpdateRequest request) {
-        User user = getUser(id);
-        if (userRepository.existsByUserName((request.getUserName()))) {
-            log.error("User with username {} already exists", request.getUserName());
-            throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
-        }
+		var saveUser = userRepository.save(user);
+        // add headers token vao feinclient
+//        ServletRequestAttributes attr =
+//                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+//        var authHeader = attr.getRequest().getHeader("Authorization");
+		var payload = UserCreatedEvent.newBuilder()
+				.setEventId(UUID.randomUUID().toString())
+				.setEventType("created")
+				.setEventVersion(1)
+				.setOccurredAt(Instant.now())
+				.setCorrelationId(null)
+				.setCausationId(UUID.randomUUID().toString())
+				.setSource("identity-service")
+				.setAggregateId(user.getUserId())
+				.setUser(UserPayload.newBuilder()
+						.setUserId(user.getUserId())
+						.setEmail(user.getEmail())
+						.setUserName(user.getUserName())
+						.setCreatedAt(user.getCreatedAt())
+						.build()
+				)
+				.build();
+		// Không nên để payload là entity user lộ thông tin quan trọng như pass
+		outboxEventService.saveOutboxEvent(
+				"user.user-created.v1",
+				"user",
+				saveUser.getUserId(),
+				"created",
+				payload,
+				"identity_service",
+				null,
+				saveUser.getUserId()
+		);
+		return userMapper.toUserResponse(saveUser);
+	}
 
-        var roles = roleRepository.findAllById(request.getRoles());
-        user.setRoles(new HashSet<>(roles));
+	@Override
+	public UserResponse updateUser(String id, UserUpdateRequest request) {
+		User user = getUser(id);
+		if (userRepository.existsByUserName((request.getUserName()))) {
+			log.error("User with username {} already exists", request.getUserName());
+			throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
+		}
 
-        userMapper.updateUser(user, request);
-        return userMapper.toUserResponse(userRepository.save(user));
-    }
+		var roles = roleRepository.findAllById(request.getRoles());
+		user.setRoles(new HashSet<>(roles));
 
-    private User getUser(String id) {
-        if (userRepository.existsById(id)) {
-            return userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        } else {
-            throw new AppException(ErrorCode.USER_NOT_FOUND);
-        }
-    }
+		userMapper.updateUser(user, request);
+		return userMapper.toUserResponse(userRepository.save(user));
+	}
 
-    @Override
-    public UserResponse getMyInformation() {
-        var authentication = SecurityContextHolder.getContext();
+	private User getUser(String id) {
+		if (userRepository.existsById(id)) {
+			return userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+		} else {
+			throw new AppException(ErrorCode.USER_NOT_FOUND);
+		}
+	}
+
+	@Override
+	public UserResponse getMyInformation() {
+		var authentication = SecurityContextHolder.getContext();
 //		String userId = ((org.springframework.security.oauth2.jwt.Jwt) authentication.getAuthentication().getPrincipal()).getSubject();
-        String userId = authentication.getAuthentication().getName();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        return userMapper.toUserResponse(user);
-    }
+		String userId = authentication.getAuthentication().getName();
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+		return userMapper.toUserResponse(user);
+	}
 
-    @Override
-    public List<UserResponse> getUsers() {
-        log.info("Fetching all users");
-        return userRepository.findAll().stream()
-                .map(userMapper::toUserResponse)
-                .toList();
-    }
+	@Override
+	public List<UserResponse> getUsers() {
+		log.info("Fetching all users");
+		return userRepository.findAll().stream()
+				.map(userMapper::toUserResponse)
+				.toList();
+	}
 
 }
-

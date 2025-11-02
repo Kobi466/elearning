@@ -1,0 +1,61 @@
+server:
+  port: 8888
+spring:
+    application:
+        name: api-gateway
+#  # ---- CẤU HÌNH SECURITY (XÁC THỰC) ----
+#    security:
+#      oauth2:
+#        resourceserver:
+#          jwt:
+#            # Chỉ dẫn cho Gateway biết nơi lấy public key để xác thực JWT
+#            introspection:
+#              endpoint-uri: http://localhost:8080/identity/api/v1/auth/introspect
+
+    cloud:
+      gateway:
+        routes:
+          - id: identity-service
+            uri: http://localhost:8080
+            predicates:
+             - Path=${app.api-prefix}/identity/**
+            filters:
+              - StripPrefix= 1
+          - id: profile-service
+            uri: http://localhost:8082
+            predicates:
+             - Path=${app.api-prefix}/profile/**
+            filters:
+              - StripPrefix= 1
+          - id: course-service
+            uri: http://localhost:8085
+            predicates:
+             - Path=${app.api-prefix}/course/**
+            filters:
+              - StripPrefix= 1
+          - id: enrollment-service
+            uri: http://localhost:8086
+            predicates:
+             - Path=${app.api-prefix}/enrollment/**
+            filters:
+              - StripPrefix= 1
+          - id: progress-service
+            uri: http://localhost:8087
+            predicates:
+              - Path=${app.api-prefix}/progress/**
+            filters:
+              - StripPrefix= 1
+          - id: review-service
+            uri: http://localhost:8088
+            predicates:
+              - Path=${app.api-prefix}/review/**
+            filters:
+              - StripPrefix= 1
+          - id: payment-service
+            uri: http://localhost:8089
+            predicates:
+              - Path=${app.api-prefix}/payment/**
+            filters:
+              - StripPrefix= 1
+app:
+  api-prefix: /api
