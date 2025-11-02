@@ -1,15 +1,14 @@
 package com.kobi.elearning.service;
 
 
+import com.kobi.elearning.dto.request.IntrospectRequest;
+import com.kobi.elearning.dto.request.LoginRequest;
+import com.kobi.elearning.dto.request.LogoutRequest;
+import com.kobi.elearning.dto.request.RefreshTokenRequest;
+import com.kobi.elearning.dto.response.AuthenticationResponse;
+import com.kobi.elearning.dto.response.IntrospectResponse;
+import com.kobi.elearning.dto.response.RefreshTokenResponse;
 import org.springframework.stereotype.Service;
-
-import com.kobi.elearning.dto.request.auth.IntrospectRequest;
-import com.kobi.elearning.dto.request.auth.LoginRequest;
-import com.kobi.elearning.dto.request.auth.LogoutRequest;
-import com.kobi.elearning.dto.request.auth.RefreshTokenRequest;
-import com.kobi.elearning.dto.response.auth.AuthenticationResponse;
-import com.kobi.elearning.dto.response.auth.IntrospectResponse;
-import com.kobi.elearning.dto.response.auth.RefreshTokenResponse;
 
 @Service
 public interface AuthenticationService {

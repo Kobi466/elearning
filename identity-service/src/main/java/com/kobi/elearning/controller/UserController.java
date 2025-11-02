@@ -1,25 +1,21 @@
 package com.kobi.elearning.controller;
 
 
-import java.util.List;
-
-import jakarta.validation.Valid;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import com.kobi.elearning.dto.request.auth.PasswordCreationRequest;
-import com.kobi.elearning.dto.request.profile.UserCreateRequest;
-import com.kobi.elearning.dto.request.profile.UserUpdateRequest;
+import com.kobi.elearning.dto.request.PasswordCreationRequest;
+import com.kobi.elearning.dto.request.UserCreateRequest;
+import com.kobi.elearning.dto.request.UserUpdateRequest;
 import com.kobi.elearning.dto.response.ApiResponse;
-import com.kobi.elearning.dto.response.profile.UserResponse;
+import com.kobi.elearning.dto.response.UserResponse;
 import com.kobi.elearning.exception.SuccessCode;
 import com.kobi.elearning.service.UserService;
-
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

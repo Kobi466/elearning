@@ -8,10 +8,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableFeignClients
-public class ELearningApplication {
+public class IdentityServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ELearningApplication.class, args);
+        SpringApplication.run(IdentityServiceApplication.class, args);
 	}
 
 }

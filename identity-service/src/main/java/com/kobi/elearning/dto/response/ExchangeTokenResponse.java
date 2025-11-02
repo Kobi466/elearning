@@ -1,8 +1,7 @@
-package com.kobi.elearning.dto.response.auth;
+package com.kobi.elearning.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

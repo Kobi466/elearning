@@ -1,4 +1,4 @@
-package com.kobi.elearning.dto.response.profile;
+package com.kobi.elearning.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -6,9 +6,8 @@ import lombok.experimental.FieldDefaults;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PermissionResponse {
-	String name;
-	String description;
+@Builder
+public class RefreshTokenRequest {
+	String token;
 }

@@ -1,22 +1,21 @@
 package com.kobi.elearning.config;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.kobi.elearning.constant.PredefinedRole;
+import com.kobi.elearning.entity.Permission;
+import com.kobi.elearning.entity.Role;
+import com.kobi.elearning.entity.User;
+import com.kobi.elearning.repository.PermissionRepository;
+import com.kobi.elearning.repository.RoleRepository;
+import com.kobi.elearning.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kobi.elearning.constant.PredefinedRole;
-import com.kobi.elearning.entity.*;
-import com.kobi.elearning.entity.User;
-import com.kobi.elearning.repository.PermissionRepository;
-import com.kobi.elearning.repository.RoleRepository;
-import com.kobi.elearning.repository.UserRepository;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -106,8 +105,8 @@ public class DataInitializer implements CommandLineRunner {
 		if (!userRepository.existsByUserName(adminUsername)) {
 			User admin = new User();
 			admin.setUserName(adminUsername);
-			admin.setPassWord(passwordEncoder.encode("admin123"));
-			admin.setFullName("Administrator");
+            admin.setPasswordHash(passwordEncoder.encode("admin123"));
+            admin.setEmail("admin123@gmail.com");
 			Role adminRole = roleRepository.findByName(PredefinedRole.ADMIN);
 			admin.setRoles(new HashSet<>(Collections.singletonList(adminRole)));
 			userRepository.save(admin);

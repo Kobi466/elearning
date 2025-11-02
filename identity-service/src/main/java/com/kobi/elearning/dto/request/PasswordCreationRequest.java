@@ -1,7 +1,6 @@
-package com.kobi.elearning.dto.request.auth;
+package com.kobi.elearning.dto.request;
 
 import jakarta.validation.constraints.Size;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

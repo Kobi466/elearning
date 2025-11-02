@@ -1,4 +1,4 @@
-package com.kobi.elearning.dto.response.auth;
+package com.kobi.elearning.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

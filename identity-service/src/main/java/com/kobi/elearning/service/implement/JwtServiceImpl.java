@@ -1,15 +1,6 @@
 package com.kobi.elearning.service.implement;
 
 
-import java.text.ParseException;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
 import com.kobi.elearning.entity.User;
 import com.kobi.elearning.exception.AppException;
 import com.kobi.elearning.exception.ErrorCode;
@@ -19,11 +10,18 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.StringJoiner;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -42,7 +40,7 @@ public class JwtServiceImpl implements JwtService {
 	public String generateAccessToken(User user) {
 		JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-				.subject(user.getId())
+                .subject(user.getUserId())
 				.claim("userName", user.getUserName())
 				.claim("scope", buildScope(user))
 				.issuer("com.kobi.elearning")
@@ -63,7 +61,7 @@ public class JwtServiceImpl implements JwtService {
 	public String generateRefreshToken(User user) {
 		JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-				.subject(user.getId())
+                .subject(user.getUserId())
 				.claim("type", "refresh")
 				.issueTime(new java.util.Date())
 				.expirationTime(new java.util.Date(System.currentTimeMillis() + refreshTokenExpiration))

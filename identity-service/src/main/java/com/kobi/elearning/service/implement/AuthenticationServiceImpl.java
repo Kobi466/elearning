@@ -1,17 +1,12 @@
 package com.kobi.elearning.service.implement;
 
 
-import java.util.*;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-
+import com.kobi.elearning.constant.AuthProvider;
 import com.kobi.elearning.constant.PredefinedRole;
-import com.kobi.elearning.dto.request.auth.*;
-import com.kobi.elearning.dto.response.auth.AuthenticationResponse;
-import com.kobi.elearning.dto.response.auth.IntrospectResponse;
-import com.kobi.elearning.dto.response.auth.RefreshTokenResponse;
+import com.kobi.elearning.dto.request.*;
+import com.kobi.elearning.dto.response.AuthenticationResponse;
+import com.kobi.elearning.dto.response.IntrospectResponse;
+import com.kobi.elearning.dto.response.RefreshTokenResponse;
 import com.kobi.elearning.entity.RefreshToken;
 import com.kobi.elearning.entity.Role;
 import com.kobi.elearning.entity.User;
@@ -26,12 +21,19 @@ import com.kobi.elearning.repository.httpclient.GoogleUserInfoClient;
 import com.kobi.elearning.service.AuthenticationService;
 import com.kobi.elearning.service.JwtService;
 import com.kobi.elearning.service.RedisService;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -62,48 +64,51 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public AuthenticationResponse authenticateUserGoogle(String code) {
-		var response = googleOauth2Client.exchangeToken(ExchangeTokenRequest.builder()
-				.clientId(clientId)
-				.clientSecret(clientSecret)
-				.code(code)
-				.grantType(grantType)
-				.redirectUri(redirectUrl)
-				.build()
-		);
-		log.info("TOKEN RESPONSE {}", response);
+        var response = googleOauth2Client.exchangeToken(ExchangeTokenRequest.builder()
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .code(code)
+                .grantType(grantType)
+                .redirectUri(redirectUrl)
+                .build()
+        );
+        log.info("TOKEN RESPONSE {}", response);
 
-		var userGg = googleUserInfoClient.getUserInfo("json", response.getAccessToken());
-		log.info("USER GG {}", userGg);
+        var userGg = googleUserInfoClient.getUserInfo("json", response.getAccessToken());
+        log.info("USER GG {}", userGg);
 
-		Set<Role> role = new HashSet<>();
-		role.add(roleRepository.findByName(PredefinedRole.STUDENT));
-		var user = userRepository.findByUserName(userGg.getEmail())
-				.orElseGet(
-				()-> userRepository.save(User
-						.builder()
-						.userName(userGg.getEmail())
-						.roles(role)
-						.fullName(userGg.getName())
-						.oauth2Account(true)
-						.build()
-				)
-		);
-		String accessToken = jwtService.generateAccessToken(user);
+        Set<Role> role = new HashSet<>();
+        role.add(roleRepository.findByName(PredefinedRole.STUDENT));
+        var user = userRepository.findByUserName(userGg.getEmail())
+                .orElseGet(
+                        () -> userRepository.save(User
+                                .builder()
+                                .userName(userGg.getEmail())
+                                .email(userGg.getEmail())
+                                .provider(AuthProvider.GOOGLE)
+                                .providerId(userGg.getId())
+                                .emailVerified(userGg.isVerifiedEmail())
+                                .roles(role)
+                                .oauth2Account(true)
+                                .build()
+                        )
+                );
+        String accessToken = jwtService.generateAccessToken(user);
 
-		return AuthenticationResponse
-				.builder()
-				.accessToken(accessToken)
-				.refreshToken(generateAndSaveRefreshToken(user))
-				.expiresAt(jwtService.getExpirationDateFromToken(accessToken))
-				.user(userMapper.toUserResponse(user))
-				.build();
-	}
+        return AuthenticationResponse
+                .builder()
+                .accessToken(accessToken)
+                .refreshToken(generateAndSaveRefreshToken(user))
+                .accessTokenExpiresAt(jwtService.getExpirationDateFromToken(accessToken))
+                .user(userMapper.toUserResponse(user))
+                .build();
+    }
 
 	@Override
 	public AuthenticationResponse authenticateUser(LoginRequest request) {
 		User user = userRepository.findByUserName(request.getUserName())
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-		boolean isAuthenticated = passwordEncoder.matches(request.getPassWord(), user.getPassWord());
+        boolean isAuthenticated = passwordEncoder.matches(request.getPassWord(), user.getPasswordHash());
 		if (!isAuthenticated) {
 			log.error("Authentication failed for user {}", request.getUserName());
 			throw new AppException(ErrorCode.AUTHENTICATION_FAILED);
@@ -112,7 +117,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return AuthenticationResponse.builder()
 				.accessToken(accessToken)
 				.refreshToken(generateAndSaveRefreshToken(user))
-				.expiresAt(jwtService.getExpirationDateFromToken(accessToken))
+                .accessTokenExpiresAt(jwtService.getExpirationDateFromToken(accessToken))
 				.user(userMapper.toUserResponse(user))
 				.build();
 	}
@@ -125,7 +130,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				.user(oneuser)
 				.token(refreshToken)
 				.expiryTime(jwtService.getExpirationDateFromToken(refreshToken))
-				.used(false)
 				.revoked(false)
 				.createdAt(jwtService.getIssuedAtDateFromToken(refreshToken))
 				.build()
@@ -152,16 +156,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
 		}
 		RefreshToken reFreshToken = refreshTokenRepository.findByToken(request.getToken());
-		if (reFreshToken.isUsed() || reFreshToken.isRevoked() ) {
+        if (reFreshToken.isRevoked()) {
 			log.error("Refresh token has already been used or revoked: {}", request.getToken());
 			throw new AppException(ErrorCode.REFRESH_TOKEN_ALREADY_USED_OR_REVOKED);
 		}
-		Date issuedAt = jwtService.getExpirationDateFromToken(request.getToken());
+//		Date issuedAt = jwtService.getExpirationDateFromToken(request.getToken());
 		if (reFreshToken.getExpiryTime().before(new java.util.Date())) {
 			log.error("Refresh token has expired: {}", request.getToken());
 			throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
 		}
-		reFreshToken.setUsed(true);
 		reFreshToken.setRevoked(true);
 		refreshTokenRepository.save(reFreshToken);
 		User user = userRepository.findById(jwtService
@@ -174,7 +177,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				.user(reFreshToken.getUser())
 				.token(newRefreshToken)
 				.expiryTime(jwtService.getExpirationDateFromToken(newRefreshToken))
-				.used(false)
 				.revoked(false)
 				.createdAt(jwtService.getIssuedAtDateFromToken(newRefreshToken))
 				.build());
@@ -200,7 +202,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		List<RefreshToken> tokenList = refreshTokenRepository.findAllByUser(user);
 		tokenList.forEach(token -> {
 			token.setRevoked(true);
-			token.setUsed(true);
 		});
 		refreshTokenRepository.saveAll(tokenList);
 	}
